@@ -1,4 +1,5 @@
 #include "DAnimNotifyState.h"
+#include "CommonEnum.h"
 #include "../DCharacter.h"
 
 void UDAnimNotifyState::NotifyBegin( USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration, const FAnimNotifyEventReference& EventReference )
@@ -15,8 +16,7 @@ void UDAnimNotifyState::NotifyEnd( USkeletalMeshComponent* MeshComp, UAnimSequen
 	{
 		if ( ADCharacter* pCharacter = Cast<ADCharacter>( MeshComp->GetOwner() ) )
 		{
-			pCharacter->SetIsPickStart( false );
+			pCharacter->OnNotifyAnimDone( EInteractiveType::Picking );
 		}
 	}
-	UGameplayStatics::GetPlayerController()
 }

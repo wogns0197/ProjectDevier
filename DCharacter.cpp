@@ -3,6 +3,7 @@
 #include <DInteractiveObject.h>
 #include "DHUDBase.h"
 #include "DPlayerController.h"
+#include "../DGameInstance.h"
 
 #include "Animation/AnimInstance.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -48,12 +49,16 @@ void ADCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	bAbleDoublePressedRun = false;
+	bMoveable = true;
 	dBaseWalkSpeed = GetCharacterMovement()->MaxWalkSpeed;
 
 	AnimInstance = Cast<UAnimInstance>( GetMesh()->GetAnimClass() );
+	GetWorldTimerManager().ClearTimer( PickTimeHandler );
 
-	if ( auto pc = Cast<ADPlayerController>( UGameplayStatics::GetPlayerController( GetWorld(), 0 ) ) ) {
-		pc->Init( this );
+	if ( auto gi = Cast<UDGameInstance>( UGameplayStatics::GetGameInstance( GetWorld() ) ) )
+	{
+		gi->InitCharacterData( this );
+		gi->DelayedInteractDoneDelegate.AddDynamic( this, &ADCharacter::OnInteractiveProcessDone );
 	}
 }
 
@@ -98,7 +103,7 @@ void ADCharacter::Turn( float v )
 
 void ADCharacter::MoveForward( float v )
 {
-	if ( v != 0.f )
+	if ( v != 0.f && bMoveable )
 	{
 		FVector ForwardDir = CameraComponent->GetForwardVector();
 		ForwardDir.Z = 0;
@@ -110,7 +115,7 @@ void ADCharacter::MoveForward( float v )
 
 void ADCharacter::MoveRight( float v )
 {
-	if ( v != 0.f )
+	if ( v != 0.f && bMoveable )
 	{
 		FVector RightDir = CameraComponent->GetRightVector();
 		RightDir.Z = 0;
@@ -162,9 +167,6 @@ void ADCharacter::OnJumpReleased()
 	bPressedJump = false;
 }
 
-//test
-bool t1 = false;
-//test
 void ADCharacter::OnInteractivePressed()
 {
 	// 인터랙트를 담당하는 매니저를 따로 둘 것인가? 아니면 캐릭터단에서 다 처리할 것인가?
@@ -174,15 +176,21 @@ void ADCharacter::OnInteractivePressed()
 	{
 		if ( WeakCurOverlapObject.Get()->GetOverlapType() == EOverlapObjectType::Interactive )
 		{
-			if ( WeakCurOverlapObject.Get()->GetInteractiveType() == EInteractiveType::Picking )
+			EInteractiveType InteractiveType = WeakCurOverlapObject.Get()->GetInteractiveType();
+			CheckUnMovableState( InteractiveType );
+			if ( InteractiveType == EInteractiveType::Picking )
 			{
-				bPickingStart = true;
-				FAttachmentTransformRules AttathRules( EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, t1 );
-				WeakCurOverlapObject->AttachToComponent( GetMesh(), AttathRules, "Fist_R_Socket" );
-				//bPickingStart = false;
+				Anim_bPickable = true;
+				// PickObjectTime 이후에 타겟 오브젝트가 소켓에 붙도록 한다
+				GetWorldTimerManager().SetTimer( PickTimeHandler, FTimerDelegate::CreateLambda( [WeakThis = TWeakObjectPtr<ADCharacter>( this ) ]()
+				{
+					if ( !WeakThis.IsValid() ) { return; }
+
+					FAttachmentTransformRules AttathRules( EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, false );
+					WeakThis.Get()->WeakCurOverlapObject->AttachToComponent( WeakThis.Get()->GetMesh(), AttathRules, "Fist_R_Socket" );
+				}), PickObjectTime, false);
 			}
 		}
-		/*WeakCurOverlapObject.Get()->Destroy();*/ // ㅋㅋ 이거 재밌네
 	}
 }
 
@@ -234,6 +242,37 @@ void ADCharacter::OnOverlapEnd( UPrimitiveComponent* OverlappedComp, AActor* Oth
 	}
 }
 
+void ADCharacter::OnNotifyAnimDone( EInteractiveType InType )
+{
+	if ( InType == EInteractiveType::Picking )
+	{
+		if ( auto GI = Cast<UDGameInstance>( UGameplayStatics::GetGameInstance( GetWorld() ) ) )
+		{
+			Anim_bPickable = false;
+			if ( !WeakCurOverlapObject.IsValid() ) {
+				return;
+			}
+
+			GI->ProcessInteractive( EInteractiveType::Picking, WeakCurOverlapObject );
+		}
+	}
+}
+
+void ADCharacter::OnInteractiveProcessDone( EInteractiveType InType )
+{
+	if ( !bMoveable )
+	{
+		switch ( InType )
+		{
+		case EInteractiveType::Picking:
+			bMoveable = true;
+			break;
+		default:
+			break;
+		}
+	}
+}
+
 void ADCharacter::RotateToDirection( FVector RotVec )
 {
 	if ( RotVec.SizeSquared() > 0 )
@@ -244,6 +283,21 @@ void ADCharacter::RotateToDirection( FVector RotVec )
 		FRotator NewRot = FQuat::Slerp( FQuat( CurRot ), FQuat( TargetRot ), RotSpeed * GetWorld()->GetDeltaSeconds() ).Rotator();
 
 		SetActorRotation( NewRot );
+	}
+}
+
+void ADCharacter::CheckUnMovableState( EInteractiveType InteractiveType )
+{
+	switch ( InteractiveType )
+	{
+		case EInteractiveType::Picking:
+		{
+			// 줍기 중에는 움직일 수 없다.
+			bMoveable = false;
+		}
+			break;
+		default:
+			break;
 	}
 }
 
