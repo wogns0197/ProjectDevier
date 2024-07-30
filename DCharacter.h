@@ -109,6 +109,7 @@ public:
 
 private:
 	class ADHUDBase* ADCharacter::GetHud();
+	void RotateToTarget( FVector vec );
 	void RotateToDirection( FVector RotVec );
 	void CheckUnMovableState( EInteractiveType InteractiveType /*분명 무언가 또 추가될 것임*/);
 

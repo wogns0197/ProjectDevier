@@ -178,6 +178,12 @@ void ADCharacter::OnInteractivePressed()
 		{
 			EInteractiveType InteractiveType = WeakCurOverlapObject.Get()->GetInteractiveType();
 			CheckUnMovableState( InteractiveType );
+
+			if ( WeakCurOverlapObject.IsValid() )
+			{
+				RotateToTarget( WeakCurOverlapObject->GetActorLocation() );
+			}
+
 			if ( InteractiveType == EInteractiveType::Picking )
 			{
 				Anim_bPickable = true;
@@ -271,6 +277,13 @@ void ADCharacter::OnInteractiveProcessDone( EInteractiveType InType )
 			break;
 		}
 	}
+}
+void ADCharacter::RotateToTarget( FVector vec )
+{
+	FRotator NewRot = UKismetMathLibrary::FindLookAtRotation( GetActorLocation(), vec );
+	NewRot.Pitch = 0.f;
+	NewRot.Roll = 0.f;
+	SetActorRotation( NewRot );
 }
 
 void ADCharacter::RotateToDirection( FVector RotVec )
