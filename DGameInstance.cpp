@@ -8,6 +8,15 @@ void UDGameInstance::InitCharacterData( ADCharacter* pOwnCharacter )
 	if ( pOwnCharacter->IsValidLowLevel() ) {
 		m_Character = Cast<ADCharacter>( pOwnCharacter );
 	}
+
+	m_Inventory.Init( TArray<FInventoryItem>(), 5 );
+	for ( int i = 0; i < (int)EInventoryType::COUNT; ++i )
+	{
+		for ( int j = 0; j < InventoryCountByType; ++j )
+		{
+			m_Inventory[i].Emplace(FInventoryItem(0, 0));
+		}
+	}
 }
 
 void UDGameInstance::ProcessInteractive( EInteractiveType InType, TWeakObjectPtr<class ADInteractiveObject> InObject )
@@ -28,11 +37,43 @@ void UDGameInstance::ProcessInteractive( EInteractiveType InType, TWeakObjectPtr
 	// 인벤토리 작업
 }
 
-bool UDGameInstance::ProcessInventory( const FInventoryParam& Param )
+bool UDGameInstance::ProcessInventory( const FInventoryProcessParam& Param )
 {
 	bool bRet = false;
+	
+	if ( Param.bAdd )
+	{
+		FInventoryItem* TargetInventoryCell = nullptr;
+		for ( auto& el : m_Inventory[(int)Param.Type] )
+		{
+			if ( el.ItemID == 0 && el.Num == 0 ) {
+				TargetInventoryCell = &el;
+				break;
+			}
+		}
 
+		if ( TargetInventoryCell )
+		{
+			TargetInventoryCell->ItemID = Param.ItemID;
+			TargetInventoryCell->Num = Param.Num;
+		}
+	}
+
+	else
+	{
+		;
+	}
+	
+	UpdateInventory();
 
 	return bRet;
 }
 
+void UDGameInstance::UpdateInventory()
+{
+	if ( m_Character )
+	{
+		m_Character->UpdateInventory();
+	}
+	// 캐릭터 포인터로 UI 및 상태 업데이트
+}

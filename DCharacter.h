@@ -68,6 +68,7 @@ protected:
 public:	
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	void UpdateInventory();
 
 public:
 	UFUNCTION()
@@ -92,6 +93,8 @@ public:
 	void OnJumpReleased();
 	UFUNCTION()
 	void OnInteractivePressed();
+	UFUNCTION()
+	void OnInventoryKeyPressed();
 	// 움직이기 키 연타 검사
 	/*UFUNCTION()
 	void OnPressedMoveD();

@@ -89,6 +89,7 @@ void ADCharacter::SetupPlayerInputComponent( UInputComponent* PlayerInputCompone
 	PlayerInputComponent->BindAction("JumpAction", IE_Repeat, this, &ADCharacter::OnJumpRepeated);
 	PlayerInputComponent->BindAction("JumpAction", IE_Released, this, &ADCharacter::OnJumpReleased);
 	PlayerInputComponent->BindAction("Interactive", IE_Pressed, this, &ADCharacter::OnInteractivePressed);
+	PlayerInputComponent->BindAction("Inventory", IE_Pressed, this, &ADCharacter::OnInventoryKeyPressed);
 }
 
 void ADCharacter::LookUp( float v )
@@ -198,6 +199,17 @@ void ADCharacter::OnInteractivePressed()
 			}
 		}
 	}
+}
+
+void ADCharacter::OnInventoryKeyPressed()
+{
+	// 인벤토리 UI Open or close
+	UpdateInventory();
+}
+
+void ADCharacter::UpdateInventory()
+{
+
 }
 
 /*void ADCharacter::OnPressedMoveD()
