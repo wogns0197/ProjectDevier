@@ -3,12 +3,8 @@
 #include "DCharacter.h"
 #include "CommonEnum.h"
 
-void UDGameInstance::InitCharacterData( ADCharacter* pOwnCharacter )
+void UDGameInstance::Init()
 {
-	if ( pOwnCharacter->IsValidLowLevel() ) {
-		m_Character = Cast<ADCharacter>( pOwnCharacter );
-	}
-
 	m_Inventory.Init( TArray<FInventoryItem>(), 5 );
 	for ( int i = 0; i < (int)EInventoryType::COUNT; ++i )
 	{
@@ -16,6 +12,18 @@ void UDGameInstance::InitCharacterData( ADCharacter* pOwnCharacter )
 		{
 			m_Inventory[i].Emplace(FInventoryItem(0, 0));
 		}
+	}
+
+	//test
+	m_Inventory[2][0].ItemID = 2001;
+	m_Inventory[2][0].Num = 1;
+	//test
+}
+
+void UDGameInstance::InitCharacterData( ADCharacter* pOwnCharacter )
+{
+	if ( pOwnCharacter->IsValidLowLevel() ) {
+		m_Character = Cast<ADCharacter>( pOwnCharacter );
 	}
 }
 

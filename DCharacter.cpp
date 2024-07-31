@@ -205,6 +205,15 @@ void ADCharacter::OnInventoryKeyPressed()
 {
 	// 인벤토리 UI Open or close
 	UpdateInventory();
+	auto hud = GetHud();
+	if ( hud->IsUIOpened( EUIType::UI_Inventory ) )
+	{
+		hud->CloseUI( EUIType::UI_Inventory );
+	}
+	else
+	{
+		hud->OpenUI( EUIType::UI_Inventory );
+	}
 }
 
 void ADCharacter::UpdateInventory()

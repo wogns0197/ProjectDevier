@@ -13,6 +13,8 @@ void UDUIInventoryItem::NativeConstruct()
 
 void UDUIInventoryItem::NativeOnListItemObjectSet( UObject* ListItemObject )
 {
+	IUserObjectListEntry::NativeOnListItemObjectSet(ListItemObject);
+
 	UUInventoryItemData* ItemData = Cast<UUInventoryItemData>( ListItemObject );
 	if ( !ItemData ) return;
 
@@ -20,12 +22,13 @@ void UDUIInventoryItem::NativeOnListItemObjectSet( UObject* ListItemObject )
 
 	const FInventoryItem& InvenInfo = ItemData->m_ItemData;
 	if ( TextBlock_Num ) {
-		TextBlock_Num->SetText( FText::FromString( FString::Printf( "%d", InvenInfo.Num ) ) );
+		TextBlock_Num->SetText( FText::FromString( FString::Printf( TEXT("%d"), InvenInfo.Num ) ) );
 	}
 
 	if ( InvenInfo.ItemID != 0 && Image_Item )
 	{
-		FString Path = "/Game/Content/Resources/Thumbnail/" + FString::Printf( "%d.uasset", InvenInfo.ItemID );
+		// sprite atlas 사용해서 드로우콜, 로드 줄이자
+		FString Path = "/Game/Content/Resources/Thumbnail/" + FString::Printf( TEXT( "%d.uasset" ), InvenInfo.ItemID );
 		static ConstructorHelpers::FObjectFinder<UTexture2D> TextureAsset( *Path );
 		if ( TextureAsset.Succeeded() )
 		{
@@ -59,4 +62,6 @@ void UDUIInventoryItem::SetBackgroundEmpty( bool bEmpty )
 		Overlay_Full->SetVisibility( !bEmpty ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed );
 	if ( TextBlock_Num )
 		TextBlock_Num->SetVisibility( !bEmpty ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed );
+	if ( Image_Item )
+		Image_Item->SetVisibility( !bEmpty ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed );
 }

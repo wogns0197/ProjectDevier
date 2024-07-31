@@ -10,7 +10,7 @@ enum class EInteractiveType;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam( FDelegateDelayedInteractDone, EInteractiveType, Type );
 
 UENUM()
-enum class EInventoryType : int8
+enum class EInventoryType
 {
 	Equip = 0,
 	Consume,
@@ -71,8 +71,12 @@ public:
 	FDelegateDelayedInteractDone DelayedInteractDoneDelegate;
 
 public:
+	virtual void Init() override;
 	void InitCharacterData( class ADCharacter* pOwnCharacter );
 	void ProcessInteractive( EInteractiveType InType, TWeakObjectPtr<class ADInteractiveObject> InObject );
+
+	// ONLY CALL FROM INVENTORY!! 객체 관리를 아주 제한적으로 하고싶기 때문에 인벤토리에서만 어쩔 수 없이 가져온다.
+	const TArray<FInventoryItem>& GetInventoryBag( EInventoryType Type ) { return m_Inventory[(int)Type]; }
 
 private:
 	bool ProcessInventory( const FInventoryProcessParam& Param );

@@ -15,6 +15,7 @@ enum class EUIType : uint8
 {
 	NONE,
 	UI_Interactive,
+	UI_Inventory,
 	UI_Hud,
 	UI_Map,
 	UI_VandingMachine,
