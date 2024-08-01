@@ -5,6 +5,7 @@
 
 void UDGameInstance::Init()
 {
+	Super::Init();
 	m_Inventory.Init( TArray<FInventoryItem>(), 5 );
 	for ( int i = 0; i < (int)EInventoryType::COUNT; ++i )
 	{
