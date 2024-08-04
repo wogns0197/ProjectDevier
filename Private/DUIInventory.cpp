@@ -6,6 +6,8 @@
 
 void UDUIInventory::NativeConstruct()
 {
+	if ( !OnVisibilityChanged.IsBound() )
+		OnVisibilityChanged.AddDynamic( this, &UDUIInventory::OnVisibilityChanged_Callback );
 }
 
 void UDUIInventory::NativeOnInitialized()
@@ -13,6 +15,9 @@ void UDUIInventory::NativeOnInitialized()
 	Super::NativeOnInitialized();
 
 	CurInvenType = EInventoryType::Equip;
+	//test
+	CurInvenType = EInventoryType::Crops;
+	//test
 	TArray<UUInventoryItemData*> ItemDataArr;
 
 	UDGameInstance* GI = Cast<UDGameInstance>( UGameplayStatics::GetGameInstance( GetWorld() ) );
@@ -32,4 +37,10 @@ void UDUIInventory::NativeOnInitialized()
 	if ( TileView_Inven ) {
 		TileView_Inven->SetListItems( ItemDataArr );
 	}
+}
+
+void UDUIInventory::OnVisibilityChanged_Callback( ESlateVisibility vis )
+{
+	if ( vis != ESlateVisibility::Collapsed )
+		SetFocus();
 }

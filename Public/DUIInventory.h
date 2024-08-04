@@ -15,6 +15,9 @@ public:
 	virtual void NativeConstruct() override;
 	virtual void NativeOnInitialized() override;
 
+	UFUNCTION()
+	void OnVisibilityChanged_Callback(ESlateVisibility vis );
+
 public:
 	UPROPERTY(meta = (BindWidget))
 	class UTileView* TileView_Inven;

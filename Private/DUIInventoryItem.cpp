@@ -1,6 +1,7 @@
 #include "DUIInventoryItem.h"
 #include "../DGameInstance.h"
 #include "Engine/Texture2D.h"
+#include "Kismet/GameplayStatics.h"
 #include "Components/Overlay.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
@@ -18,8 +19,6 @@ void UDUIInventoryItem::NativeOnListItemObjectSet( UObject* ListItemObject )
 	UUInventoryItemData* ItemData = Cast<UUInventoryItemData>( ListItemObject );
 	if ( !ItemData ) return;
 
-	SetBackgroundEmpty( false );
-
 	const FInventoryItem& InvenInfo = ItemData->m_ItemData;
 	if ( TextBlock_Num ) {
 		TextBlock_Num->SetText( FText::FromString( FString::Printf( TEXT("%d"), InvenInfo.Num ) ) );
@@ -27,16 +26,19 @@ void UDUIInventoryItem::NativeOnListItemObjectSet( UObject* ListItemObject )
 
 	if ( InvenInfo.ItemID != 0 && Image_Item )
 	{
+		SetBackgroundEmpty( false );
 		// sprite atlas 사용해서 드로우콜, 로드 줄이자
-		FString Path = "/Game/Content/Resources/Thumbnail/" + FString::Printf( TEXT( "%d.uasset" ), InvenInfo.ItemID );
-		static ConstructorHelpers::FObjectFinder<UTexture2D> TextureAsset( *Path );
-		if ( TextureAsset.Succeeded() )
+		UDGameInstance* GI = Cast<UDGameInstance >( UGameplayStatics::GetGameInstance(GetWorld()) );
+		FSlateBrush Brush;
+		Brush.SetResourceObject( GI->GetThumbnail( InvenInfo.ItemID ) );
+		Image_Item->SetBrush( Brush );
+		/*if ( TextureAsset.Succeeded() )
 		{
 			UTexture2D* pTexture = TextureAsset.Object;
 			FSlateBrush Brush;
 			Brush.SetResourceObject( pTexture );
 			Image_Item->SetBrush( Brush );
-		}
+		}*/
 	}
 
 }

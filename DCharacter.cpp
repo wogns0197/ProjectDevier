@@ -51,6 +51,7 @@ void ADCharacter::BeginPlay()
 	bAbleDoublePressedRun = false;
 	bMoveable = true;
 	dBaseWalkSpeed = GetCharacterMovement()->MaxWalkSpeed;
+	bCameraUseCursor = true;
 
 	AnimInstance = Cast<UAnimInstance>( GetMesh()->GetAnimClass() );
 	GetWorldTimerManager().ClearTimer( PickTimeHandler );
@@ -94,11 +95,13 @@ void ADCharacter::SetupPlayerInputComponent( UInputComponent* PlayerInputCompone
 
 void ADCharacter::LookUp( float v )
 {
+	if ( !bCameraUseCursor ) { return; }
 	AddControllerPitchInput( -v );
 }
 
 void ADCharacter::Turn( float v )
 {
+	if ( !bCameraUseCursor ) { return; }
 	AddControllerYawInput( v );
 }
 
@@ -208,10 +211,12 @@ void ADCharacter::OnInventoryKeyPressed()
 	auto hud = GetHud();
 	if ( hud->IsUIOpened( EUIType::UI_Inventory ) )
 	{
+		SetFocusToMouseCursorAndShow( false );
 		hud->CloseUI( EUIType::UI_Inventory );
 	}
 	else
 	{
+		SetFocusToMouseCursorAndShow( true );
 		hud->OpenUI( EUIType::UI_Inventory );
 	}
 }
@@ -333,6 +338,12 @@ void ADCharacter::CheckUnMovableState( EInteractiveType InteractiveType )
 		default:
 			break;
 	}
+}
+
+void ADCharacter::SetFocusToMouseCursorAndShow( bool bFocus )
+{
+	UGameplayStatics::GetPlayerController( GetWorld(), 0 )->bShowMouseCursor = bFocus;
+	bCameraUseCursor = !bFocus;
 }
 
 ADHUDBase* ADCharacter::GetHud()

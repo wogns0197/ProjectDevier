@@ -67,6 +67,8 @@ private:
 
 	TArray<TArray<FInventoryItem>> m_Inventory;
 
+	TMap<int, UTexture2D*> ThumbnailsArr;
+
 public:
 	FDelegateDelayedInteractDone DelayedInteractDoneDelegate;
 
@@ -78,7 +80,11 @@ public:
 	// ONLY CALL FROM INVENTORY!! 객체 관리를 아주 제한적으로 하고싶기 때문에 인벤토리에서만 어쩔 수 없이 가져온다.
 	const TArray<FInventoryItem>& GetInventoryBag( EInventoryType Type ) { return m_Inventory[(int)Type]; }
 
+	UTexture2D* GetThumbnail( int InItemID );
+
 private:
+	void LoadAllTexturesInDirectory( const FString& Directory );
+	void LoadSpriteAsync( const FString& AssetPath );
 	bool ProcessInventory( const FInventoryProcessParam& Param );
 	void UpdateInventory();
 };

@@ -46,6 +46,7 @@ private:
 	bool Anim_bPickable;
 	bool bAbleDoublePressedRun; // 움직이기 키 두번으로 뛸 수 있는 연타간 시간 간격 검사
 	bool bMoveable; // 캐릭터 무빙 잠금 (ex 줍기 시)
+	bool bCameraUseCursor;
 
 	// 오브젝트 줍기 애님 중 땅에 손이 닿는 타이밍(사실 에님 노티파이로 하면 됨 ㅋㅋ;;)
 	FTimerHandle PickTimeHandler;
@@ -115,5 +116,7 @@ private:
 	void RotateToTarget( FVector vec );
 	void RotateToDirection( FVector RotVec );
 	void CheckUnMovableState( EInteractiveType InteractiveType /*분명 무언가 또 추가될 것임*/);
+
+	void SetFocusToMouseCursorAndShow( bool bFocus ); // UI 오픈 시 카메라가 마우스 움직임을 받을지 안받을지 + 커서 Show
 
 };
