@@ -63,7 +63,7 @@ struct FItemBaseInfo
 	FDateTime ExpireDate;
 
 	FItemBaseInfo() : ItemName( FText::GetEmpty() ), ToolTip( FText::GetEmpty() ), Price( 99 ), ExpireDate( FDateTime( 2079, 1, 1, 12, 59, 59 ) ) {};
-}
+};
 
 UCLASS()
 class PROJECTD_API UDGameInstance : public UGameInstance

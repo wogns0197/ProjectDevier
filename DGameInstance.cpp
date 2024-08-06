@@ -59,7 +59,7 @@ bool UDGameInstance::IsInventoryPuttable( TWeakObjectPtr<ADInteractiveObject> In
 
 	const int nItemID = InWeakPtr.Get()->GetItemID();
 	checkf( nItemID > 999, TEXT( "ItemID(%d) Is Not Valid! Actor : %s" ), nItemID, *InWeakPtr->GetClass()->GetName() );
-	checkf( 1 < nItemID / 1000 && nItemID / 1000 < 5, TEXT( "Invalid Item Type | ItemID : %d", nItemID ) );
+	checkf( 1 < nItemID / 1000 && nItemID / 1000 < 5, TEXT( "Invalid Item Type | ItemID : %d" ), nItemID );
 
 	EInventoryType InvenType = EInventoryType( nItemID / 1000 );
 	bool bEmpty = false;
@@ -68,7 +68,7 @@ bool UDGameInstance::IsInventoryPuttable( TWeakObjectPtr<ADInteractiveObject> In
 		if ( bagItem.ItemID == 0 )
 		{
 			// ItemID는 정상인데 Num이 0인 유령아이템 검사
-			check( bagItem.Num < 1, "Invalid Inventory Bag Item | Type : %d | ItemID : %d | Num : %d  << num is zero", (int)InvenType, nItemID, bagItem.Num );
+			checkf( bagItem.Num < 1, TEXT( "Invalid Inventory Bag Item | Type : %d | ItemID : %d | Num : %d  << num is zero" ), (int)InvenType, nItemID, bagItem.Num );
 			if ( bagItem.Num == 0 )
 			{
 				bEmpty = true;
