@@ -63,6 +63,11 @@ public:
 
 	FTimerHandle DoubleMovePressedTimerHandle;
 
+// UI
+private:
+	UPROPERTY()
+	class UDUIInventory* m_pUIInventory;
+
 protected:
 	virtual void BeginPlay() override;
 

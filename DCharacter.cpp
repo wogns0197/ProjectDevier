@@ -4,6 +4,7 @@
 #include "DHUDBase.h"
 #include "DPlayerController.h"
 #include "../DGameInstance.h"
+#include "DUIInventory.h"
 
 #include "Animation/AnimInstance.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -183,6 +184,13 @@ void ADCharacter::OnInteractivePressed()
 			EInteractiveType InteractiveType = WeakCurOverlapObject.Get()->GetInteractiveType();
 			CheckUnMovableState( InteractiveType );
 
+			auto GI = Cast<UDGameInstance>( UGameplayStatics::GetGameInstance( GetWorld() ) );
+			bool bInvenPreRet = GI->IsInventoryPuttable( WeakCurOverlapObject );
+			if ( !bInvenPreRet ) {
+				// 불가 채팅 메세지
+				return;
+			}
+
 			if ( WeakCurOverlapObject.IsValid() )
 			{
 				RotateToTarget( WeakCurOverlapObject->GetActorLocation() );
@@ -217,13 +225,18 @@ void ADCharacter::OnInventoryKeyPressed()
 	else
 	{
 		SetFocusToMouseCursorAndShow( true );
-		hud->OpenUI( EUIType::UI_Inventory );
+		auto pUI = Cast<UDUIInventory>( hud->OpenUI( EUIType::UI_Inventory ) );
+		if ( !m_pUIInventory && pUI ) {
+			m_pUIInventory = pUI;
+		}
 	}
 }
 
 void ADCharacter::UpdateInventory()
 {
-
+	if ( m_pUIInventory ) {
+		m_pUIInventory->UpdateTypeBag();
+	}
 }
 
 /*void ADCharacter::OnPressedMoveD()

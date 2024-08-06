@@ -11,7 +11,11 @@ UCLASS()
 class PROJECTD_API ADInteractiveObject : public AActor
 {
 	GENERATED_BODY()
-	
+
+public:
+	UPROPERTY(EditAnywhere, Category="ItemInfo")
+	int ItemID;
+
 protected:
 	EOverlapObjectType OverlapType;
 	EInteractiveType InteractiveType;
@@ -20,6 +24,7 @@ public:
 	ADInteractiveObject();
 	const EOverlapObjectType GetOverlapType() { return OverlapType; }
 	const EInteractiveType GetInteractiveType() { return InteractiveType; }
+	const int GetItemID() { return ItemID; }
 
 protected:
 	virtual void BeginPlay() override;

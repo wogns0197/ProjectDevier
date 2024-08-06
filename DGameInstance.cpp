@@ -53,6 +53,33 @@ void UDGameInstance::ProcessInteractive( EInteractiveType InType, TWeakObjectPtr
 	// 인벤토리 작업
 }
 
+bool UDGameInstance::IsInventoryPuttable( TWeakObjectPtr<ADInteractiveObject> InWeakPtr )
+{
+	if ( !InWeakPtr.IsValid() ) { return false; }
+
+	const int nItemID = InWeakPtr.Get()->GetItemID();
+	checkf( nItemID > 999, TEXT( "ItemID(%d) Is Not Valid! Actor : %s" ), nItemID, *InWeakPtr->GetClass()->GetName() );
+	checkf( 1 < nItemID / 1000 && nItemID / 1000 < 5, TEXT( "Invalid Item Type | ItemID : %d", nItemID ) );
+
+	EInventoryType InvenType = EInventoryType( nItemID / 1000 );
+	bool bEmpty = false;
+	for ( int i = 0; i < m_Inventory[(int)InvenType].Num(); i++ ) {
+		const auto& bagItem = m_Inventory[(int)InvenType][i];
+		if ( bagItem.ItemID == 0 )
+		{
+			// ItemID는 정상인데 Num이 0인 유령아이템 검사
+			check( bagItem.Num < 1, "Invalid Inventory Bag Item | Type : %d | ItemID : %d | Num : %d  << num is zero", (int)InvenType, nItemID, bagItem.Num );
+			if ( bagItem.Num == 0 )
+			{
+				bEmpty = true;
+				break;
+			}
+		}
+	}
+
+	return bEmpty;
+}
+
 bool UDGameInstance::ProcessInventory( const FInventoryProcessParam& Param )
 {
 	bool bRet = false;

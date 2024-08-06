@@ -2,7 +2,10 @@
 
 #include "CoreMinimal.h"
 #include "DInteractiveObject.h"
+#include "../DGameInstance.h"
 #include "DFarmCrop.generated.h"
+
+
 
 UCLASS()
 class PROJECTD_API ADFarmCrop : public ADInteractiveObject
@@ -17,5 +20,6 @@ protected:
 
 public:	
 	virtual void Tick(float DeltaTime) override;
+
 
 };

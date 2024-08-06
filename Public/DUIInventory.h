@@ -18,6 +18,8 @@ public:
 	UFUNCTION()
 	void OnVisibilityChanged_Callback(ESlateVisibility vis );
 
+	void UpdateTypeBag();
+
 public:
 	UPROPERTY(meta = (BindWidget))
 	class UTileView* TileView_Inven;

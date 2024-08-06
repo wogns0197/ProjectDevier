@@ -18,8 +18,24 @@ void UDUIInventory::NativeOnInitialized()
 	//test
 	CurInvenType = EInventoryType::Crops;
 	//test
-	TArray<UUInventoryItemData*> ItemDataArr;
+	UpdateTypeBag();
+}
 
+void UDUIInventory::OnVisibilityChanged_Callback( ESlateVisibility vis )
+{
+	if ( vis != ESlateVisibility::Collapsed )
+		SetFocus();
+}
+
+void UDUIInventory::UpdateTypeBag()
+{
+	if ( !TileView_Inven ) {
+		return;
+	}
+
+	TileView_Inven->ClearListItems();
+
+	TArray<UUInventoryItemData*> ItemDataArr;
 	UDGameInstance* GI = Cast<UDGameInstance>( UGameplayStatics::GetGameInstance( GetWorld() ) );
 	if ( GI )
 	{
@@ -34,13 +50,6 @@ void UDUIInventory::NativeOnInitialized()
 
 	}
 
-	if ( TileView_Inven ) {
-		TileView_Inven->SetListItems( ItemDataArr );
-	}
-}
-
-void UDUIInventory::OnVisibilityChanged_Callback( ESlateVisibility vis )
-{
-	if ( vis != ESlateVisibility::Collapsed )
-		SetFocus();
+	TileView_Inven->SetListItems( ItemDataArr );
+	TileView_Inven->RegenerateAllEntries();
 }
