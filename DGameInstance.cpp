@@ -35,6 +35,8 @@ void UDGameInstance::InitCharacterData( ADCharacter* pOwnCharacter )
 	}
 }
 
+// 습득 처리 순서
+// OnInteractivePressed -> IsInventoryPuttable -> RotateToTarget -> ..Timer..AttachToComponent -> Anim_bPickable ( Play Animation ) -> AnimNotify to GI -> Fill Inven -> Destroy
 void UDGameInstance::ProcessInteractive( EInteractiveType InType, TWeakObjectPtr<class ADInteractiveObject> InObject )
 {
 	switch ( InType )
@@ -42,6 +44,13 @@ void UDGameInstance::ProcessInteractive( EInteractiveType InType, TWeakObjectPtr
 	case EInteractiveType::Picking:
 		if ( InObject.IsValid() )
 		{
+			// 여기서 기본 갯수를 1로 하는데, 나중에 복수로 바꾸려면 인벤에 개별가방 칸당 복수처리가 되어야함 아래 코드가 굉장히 별로임
+			const int nItemID = InObject.Get()->GetItemID();
+			FInventoryProcessParam Item( EInventoryType( nItemID / 1000 ), true, nItemID, 1, 0 );
+			if ( !ProcessInventory( Item ) ) {
+				UE_LOG( LogTemp, Warning, TEXT("ProcessInventory Fail :: ItemID|%d|ActorClass|%s"), nItemID, *InObject->GetClass()->GetName() );
+			}
+
 			InObject->Destroy();
 			DelayedInteractDoneDelegate.Broadcast( InType );
 		}
@@ -86,10 +95,18 @@ bool UDGameInstance::ProcessInventory( const FInventoryProcessParam& Param )
 	
 	if ( Param.bAdd )
 	{
+		bool bSameItem = false;
 		FInventoryItem* TargetInventoryCell = nullptr;
 		for ( auto& el : m_Inventory[(int)Param.Type] )
 		{
-			if ( el.ItemID == 0 && el.Num == 0 ) {
+			if ( el.ItemID == Param.ItemID && el.Num <= MaxCountByBagItem[Param.Type] ) // 같은 아이템이 이미 있으면 Max 이내에서 최대로 올려준다. 조건 분기 구조 맘에 안듬
+			{
+				TargetInventoryCell = &el;
+				bSameItem = true;
+				break;
+			}
+			else if ( el.ItemID == 0 && el.Num == 0 )
+			{
 				TargetInventoryCell = &el;
 				break;
 			}
@@ -97,8 +114,16 @@ bool UDGameInstance::ProcessInventory( const FInventoryProcessParam& Param )
 
 		if ( TargetInventoryCell )
 		{
-			TargetInventoryCell->ItemID = Param.ItemID;
-			TargetInventoryCell->Num = Param.Num;
+			if ( bSameItem )
+			{
+				TargetInventoryCell->Num = FMath::Min( TargetInventoryCell->Num + 1, MaxCountByBagItem[Param.Type] );
+			}
+			else
+			{
+				TargetInventoryCell->ItemID = Param.ItemID;
+				TargetInventoryCell->Num = Param.Num;
+			}
+			bRet = true;
 		}
 	}
 

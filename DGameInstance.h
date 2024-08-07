@@ -72,7 +72,10 @@ class PROJECTD_API UDGameInstance : public UGameInstance
 
 public:
 	UPROPERTY(EditAnywhere)
-	int InventoryCountByType; // 타입별 최대 인벤토리 갯수
+	int InventoryCountByType; // 타입별 최대 가방 칸 개수
+	UPROPERTY(EditAnywhere)
+	TMap<EInventoryType, int> MaxCountByBagItem; // 타입별 아이템 한 칸당 최대 Num
+
 	UPROPERTY(EditAnywhere)
 	TMap<int, FItemBaseInfo> m_mItemInfo;
 

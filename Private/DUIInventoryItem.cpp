@@ -15,6 +15,7 @@ void UDUIInventoryItem::NativeConstruct()
 void UDUIInventoryItem::NativeOnListItemObjectSet( UObject* ListItemObject )
 {
 	IUserObjectListEntry::NativeOnListItemObjectSet(ListItemObject);
+	SetBackgroundEmpty( true );
 
 	UUInventoryItemData* ItemData = Cast<UUInventoryItemData>( ListItemObject );
 	if ( !ItemData ) return;

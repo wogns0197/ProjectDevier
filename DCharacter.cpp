@@ -62,6 +62,11 @@ void ADCharacter::BeginPlay()
 		gi->InitCharacterData( this );
 		gi->DelayedInteractDoneDelegate.AddDynamic( this, &ADCharacter::OnInteractiveProcessDone );
 	}
+
+	auto pUI = Cast<UDUIInventory>( GetHud()->GetUI(EUIType::UI_Inventory));
+	if ( !m_pUIInventory && pUI ) {
+		m_pUIInventory = pUI;
+	}
 }
 
 void ADCharacter::Tick(float DeltaTime)
@@ -225,10 +230,7 @@ void ADCharacter::OnInventoryKeyPressed()
 	else
 	{
 		SetFocusToMouseCursorAndShow( true );
-		auto pUI = Cast<UDUIInventory>( hud->OpenUI( EUIType::UI_Inventory ) );
-		if ( !m_pUIInventory && pUI ) {
-			m_pUIInventory = pUI;
-		}
+		hud->OpenUI( EUIType::UI_Inventory );
 	}
 }
 

@@ -50,6 +50,6 @@ void UDUIInventory::UpdateTypeBag()
 
 	}
 
-	TileView_Inven->SetListItems( ItemDataArr );
 	TileView_Inven->RegenerateAllEntries();
+	TileView_Inven->SetListItems( ItemDataArr );
 }
