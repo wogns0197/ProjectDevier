@@ -9,6 +9,7 @@
 #include "Animation/AnimInstance.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
+#include "Blueprint/WidgetBlueprintLibrary.h"
 
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -52,7 +53,6 @@ void ADCharacter::BeginPlay()
 	bAbleDoublePressedRun = false;
 	bMoveable = true;
 	dBaseWalkSpeed = GetCharacterMovement()->MaxWalkSpeed;
-	bCameraUseCursor = true;
 
 	AnimInstance = Cast<UAnimInstance>( GetMesh()->GetAnimClass() );
 	GetWorldTimerManager().ClearTimer( PickTimeHandler );
@@ -101,13 +101,11 @@ void ADCharacter::SetupPlayerInputComponent( UInputComponent* PlayerInputCompone
 
 void ADCharacter::LookUp( float v )
 {
-	if ( !bCameraUseCursor ) { return; }
-	AddControllerPitchInput( -v );
+	AddControllerPitchInput( v );
 }
 
 void ADCharacter::Turn( float v )
 {
-	if ( !bCameraUseCursor ) { return; }
 	AddControllerYawInput( v );
 }
 
@@ -358,7 +356,10 @@ void ADCharacter::CheckUnMovableState( EInteractiveType InteractiveType )
 void ADCharacter::SetFocusToMouseCursorAndShow( bool bFocus )
 {
 	UGameplayStatics::GetPlayerController( GetWorld(), 0 )->bShowMouseCursor = bFocus;
-	bCameraUseCursor = !bFocus;
+	if ( bFocus )
+		UWidgetBlueprintLibrary::SetInputMode_UIOnlyEx( UGameplayStatics::GetPlayerController( GetWorld(), 0 ), nullptr, EMouseLockMode::DoNotLock );
+	else
+		UWidgetBlueprintLibrary::SetInputMode_GameOnly( UGameplayStatics::GetPlayerController( GetWorld(), 0 ) );
 }
 
 ADHUDBase* ADCharacter::GetHud()
