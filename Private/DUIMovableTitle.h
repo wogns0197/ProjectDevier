@@ -12,12 +12,17 @@ class UDUIMovableTitle : public UUserWidget
 	GENERATED_BODY()
 	
 private:
-	UUserWidget* ParentWidget;
+	class UDUIMovableUserWidget* ParentWidget;
+	bool bMouseIn = false;
+	bool bMouseDown = false;
 
 public:
-	void SetParentWidget( UUserWidget* wnd ) { ParentWidget = wnd; }
+	void SetParentWidget( UUserWidget* wnd );
 
 public:
-	virtual void NativeOnDragDetected( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation ) override;
+	virtual void NativeOnMouseEnter( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent ) override;
+	virtual void NativeOnMouseLeave( const FPointerEvent& InMouseEvent ) override;
+	virtual FReply NativeOnMouseMove( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent ) override;
 	virtual FReply NativeOnMouseButtonDown( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent ) override;
+	virtual FReply NativeOnMouseButtonUp( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent ) override;
 };

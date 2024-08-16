@@ -1,13 +1,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Blueprint/UserWidget.h"
+#include "DUIMovableUserWidget.h"
 #include "DUIInventory.generated.h"
 
 enum class EInventoryType;
 
 UCLASS()
-class PROJECTD_API UDUIInventory : public UUserWidget
+class PROJECTD_API UDUIInventory : public UDUIMovableUserWidget
 {
 	GENERATED_BODY()
 

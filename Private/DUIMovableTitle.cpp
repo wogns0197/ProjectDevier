@@ -1,23 +1,60 @@
 #include "DUIMovableTitle.h"
-
-void UDUIMovableTitle::NativeOnDragDetected( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation )
-{
-	Super::NativeOnDragDetected( InGeometry, InMouseEvent, OutOperation );
-	if ( ParentWidget ) {
-		const FGeometry& Geom = ParentWidget->GetCachedGeometry();
-		FVector2D Position = Geom.AbsoluteToLocal(GetCachedGeometry().GetAbsolutePosition()) + GetCachedGeometry().GetLocalSize() / 2.0f;
-		ParentWidget->SetPositionInViewport( Geom.AbsoluteToLocal( InMouseEvent.GetScreenSpacePosition() ) );
-		int a = 0;
-	}
-}
+#include "DUIMovableUserWidget.h"
+#include "Blueprint/SlateBlueprintLibrary.h"
 
 FReply UDUIMovableTitle::NativeOnMouseButtonDown( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent )
 {
-	if (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
-    {
-        // 드래그를 감지하도록 설정
-        return FReply::Handled().DetectDrag(TakeWidget(), EKeys::LeftMouseButton);
-    }
+	Super::NativeOnMouseButtonDown( InGeometry, InMouseEvent );
 
-    return FReply::Unhandled();
+	bMouseDown = true;
+
+    return FReply::Handled();
+}
+
+FReply UDUIMovableTitle::NativeOnMouseButtonUp( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent )
+{
+	Super::NativeOnMouseButtonUp( InGeometry, InMouseEvent );
+
+	bMouseDown = false;
+
+	return FReply::Handled();
+}
+
+void UDUIMovableTitle::SetParentWidget( UUserWidget* wnd )
+{ 
+	if ( UDUIMovableUserWidget* MovableWidget = Cast<UDUIMovableUserWidget>( wnd ) ) {
+		ParentWidget = MovableWidget;
+	}
+}
+
+void UDUIMovableTitle::NativeOnMouseEnter( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent )
+{
+	Super::NativeOnMouseEnter( InGeometry, InMouseEvent );
+
+	bMouseDown = false;
+	bMouseIn = true;
+}
+
+void UDUIMovableTitle::NativeOnMouseLeave( const FPointerEvent& InMouseEvent )
+{
+	Super::NativeOnMouseLeave( InMouseEvent );
+
+	bMouseIn = false;
+}
+
+FReply UDUIMovableTitle::NativeOnMouseMove( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent )
+{
+	Super::NativeOnMouseMove( InGeometry, InMouseEvent );
+
+	if ( bMouseDown && bMouseIn )
+	{
+		if ( ParentWidget )
+		{
+			const FGeometry& Geom = ParentWidget->GetCachedGeometry();
+			FVector2D NewPos = Geom.AbsoluteToLocal( InMouseEvent.GetScreenSpacePosition() );
+			ParentWidget->SetWidgetPosition( NewPos );
+		}
+	}
+
+	return FReply::Handled();
 }
