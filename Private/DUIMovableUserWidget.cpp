@@ -9,3 +9,13 @@ void UDUIMovableUserWidget::SetWidgetPosition( FVector2D NewPosition )
         CanvasSlot->SetPosition( NewPosition );
     }
 }
+
+FVector2D UDUIMovableUserWidget::GetWidgetPosition()
+{
+    if ( UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>( ParentCanvas->GetSlots()[0]) )
+    {
+        return CanvasSlot->GetPosition();
+    }
+
+    return FVector2D();
+}

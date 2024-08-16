@@ -15,6 +15,7 @@ private:
 	class UDUIMovableUserWidget* ParentWidget;
 	bool bMouseIn = false;
 	bool bMouseDown = false;
+	FVector2D Pivot;
 
 public:
 	void SetParentWidget( UUserWidget* wnd );

@@ -15,5 +15,5 @@ public:
 
 public:
 	void SetWidgetPosition( FVector2D NewPosition );
-	
+	FVector2D GetWidgetPosition();
 };
