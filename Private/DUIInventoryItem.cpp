@@ -10,6 +10,7 @@
 void UDUIInventoryItem::NativeConstruct()
 {
 	SetBackgroundEmpty( true );
+	bSetData = false;
 }
 
 void UDUIInventoryItem::NativeOnListItemObjectSet( UObject* ListItemObject )
@@ -33,6 +34,7 @@ void UDUIInventoryItem::NativeOnListItemObjectSet( UObject* ListItemObject )
 		FSlateBrush Brush;
 		Brush.SetResourceObject( GI->GetThumbnail( InvenInfo.ItemID ) );
 		Image_Item->SetBrush( Brush );
+		bSetData = true;
 		/*if ( TextureAsset.Succeeded() )
 		{
 			UTexture2D* pTexture = TextureAsset.Object;
@@ -50,11 +52,22 @@ void UDUIInventoryItem::NativeOnItemSelectionChanged( bool bIsSelected )
 
 void UDUIInventoryItem::NativeOnMouseEnter( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent )
 {
-
+	if ( bSetData )
+	{
+		if ( Image_Item && OnMouseEnterAnim )
+			PlayAnimation( OnMouseEnterAnim );
+		UGameplayStatics::GetPlayerController( GetWorld(), 0 )->CurrentMouseCursor = EMouseCursor::GrabHand;
+	}
 }
 
 void UDUIInventoryItem::NativeOnMouseLeave( const FPointerEvent& InMouseEvent )
 {
+	if ( bSetData )
+	{
+		if ( Image_Item && OnMouseLeaveAnim )
+			PlayAnimation( OnMouseLeaveAnim );
+		UGameplayStatics::GetPlayerController( GetWorld(), 0 )->CurrentMouseCursor = EMouseCursor::Default;
+	}
 }
 
 void UDUIInventoryItem::SetBackgroundEmpty( bool bEmpty )

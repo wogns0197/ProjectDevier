@@ -21,6 +21,15 @@ public:
 	class UImage* Image_Item;
 
 public:
+	UPROPERTY(meta = (BindWidgetAnim), Transient)
+	class UWidgetAnimation* OnMouseEnterAnim;
+	UPROPERTY(meta = (BindWidgetAnim), Transient)
+	class UWidgetAnimation* OnMouseLeaveAnim;
+
+private:
+	bool bSetData;
+
+public:
 	virtual void NativeConstruct() override;
 	virtual void NativeOnListItemObjectSet(UObject* ListItemObject) override;
 	virtual void NativeOnItemSelectionChanged( bool bIsSelected ) override;

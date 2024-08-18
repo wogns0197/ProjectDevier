@@ -9,12 +9,12 @@ FReply UDUIMovableTitle::NativeOnMouseButtonDown( const FGeometry& InGeometry, c
 	bMouseDown = true;
 
 	if ( ParentWidget )
-	{
-		const FGeometry& Geom = ParentWidget->GetCachedGeometry();
-		Pivot = Geom.AbsoluteToLocal( InMouseEvent.GetScreenSpacePosition() );
-	}
+		{
+			const FGeometry& Geom = ParentWidget->GetCachedGeometry();
+			Pivot = Geom.AbsoluteToLocal( InMouseEvent.GetScreenSpacePosition() ) - ParentWidget->GetWidgetPosition();
+		}
 
-    return FReply::Handled();
+	return FReply::Handled();
 }
 
 FReply UDUIMovableTitle::NativeOnMouseButtonUp( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent )
@@ -50,7 +50,6 @@ void UDUIMovableTitle::NativeOnMouseLeave( const FPointerEvent& InMouseEvent )
 
 FReply UDUIMovableTitle::NativeOnMouseMove( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent )
 {
-	Super::NativeOnMouseMove( InGeometry, InMouseEvent );
 	// 아무리....봐도.. 드래그로 처리하는게 맞는데 드래그는 진짜 Drag Operation이 필요한 소규모 위젯에 쓰자..
 
 	if ( bMouseDown && bMouseIn )
@@ -58,10 +57,9 @@ FReply UDUIMovableTitle::NativeOnMouseMove( const FGeometry& InGeometry, const F
 		if ( ParentWidget )
 		{
 			const FGeometry& Geom = ParentWidget->GetCachedGeometry();
-			FVector2D NewPos = Geom.AbsoluteToLocal( InMouseEvent.GetScreenSpacePosition() ) - Pivot;
-			ParentWidget->SetWidgetPosition( NewPos );
+			ParentWidget->SetWidgetPosition( Geom.AbsoluteToLocal( InMouseEvent.GetScreenSpacePosition() ) - Pivot );
 		}
 	}
 
-	return FReply::Handled();
+	return Super::NativeOnMouseMove( InGeometry, InMouseEvent );
 }

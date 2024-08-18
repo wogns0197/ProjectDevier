@@ -88,6 +88,9 @@ private:
 	TMap<int, UTexture2D*> ThumbnailsArr;
 
 public:
+	EInventoryType LastInventoryUIBagType; // 인벤토리를 다시 열 때 이전에 닫았던 탭으로 다시 열어줌
+
+public:
 	FDelegateDelayedInteractDone DelayedInteractDoneDelegate;
 
 public:
