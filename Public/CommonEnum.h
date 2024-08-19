@@ -18,6 +18,7 @@ enum class EInteractiveType
 	NONE = -1,
 
 	Picking,
+	Trembling, // ³ª¹« Èçµé±â
 
 	COUNT,
 };
