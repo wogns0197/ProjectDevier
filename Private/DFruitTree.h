@@ -17,6 +17,10 @@ public:
 	TSubclassOf<class ADFarmCrop> FruitCropClass;
 	UPROPERTY(EditAnywhere)
 	TSoftObjectPtr<UStaticMesh> FruitMeshClass;
+	UPROPERTY(EditAnywhere)
+	float ThrowFruitDelayTime; // Interact직후부터 과일떨어뜨리기까지 시간
+	UPROPERTY(EditAnywhere)
+	int LengthGenerateFruit; // 나무로부터 과일생성위치까지의 길이 ( 4방향 랜덤 )
 
 	UPROPERTY(EditAnywhere)
 	class UCapsuleComponent* OverlapCapsuleComponent; // 오버랩
@@ -35,11 +39,13 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UStaticMeshComponent* FruitStaticMesh_4;
 
+private:
+	FTimerHandle ThrowTimeHanle;
 
 protected:
 	virtual void BeginPlay() override;
 
 public:	
 	virtual void Tick(float DeltaTime) override;
-
+	virtual void OnStartInteractive() override;
 };

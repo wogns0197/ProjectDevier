@@ -146,6 +146,19 @@ void UDGameInstance::UpdateInventory()
 	// 캐릭터 포인터로 UI 및 상태 업데이트
 }
 
+bool UDGameInstance::IsAbleToTremble( TWeakObjectPtr<class ADInteractiveObject> InWeakPtr )
+{
+	bool bRet = false;
+	if ( InWeakPtr.IsValid() )
+	{
+		if ( InWeakPtr->GetInteractiveType() == EInteractiveType::Trembling ) {
+			bRet = true;
+		}
+	}
+		
+	return bRet;
+}
+
 void UDGameInstance::LoadAllTexturesInDirectory(const FString& Directory)
 {
     TArray<FString> Files;

@@ -1,5 +1,6 @@
 #include "DFruitTree.h"
 #include "CommonEnum.h"
+#include "DFarmCrop.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/CapsuleComponent.h"
 
@@ -55,5 +56,17 @@ void ADFruitTree::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void ADFruitTree::OnStartInteractive()
+{
+	checkf( LengthGenerateFruit > 0, TEXT( "LengthGenerateFruit is Zero" ) );
+	GetWorld()->GetTimerManager().SetTimer( ThrowTimeHanle, FTimerDelegate::CreateLambda( [WeakPtr = TWeakObjectPtr<ADFruitTree>( this )]() {
+		if ( !WeakPtr.IsValid() ) { return; }
+
+		const FVector GenOffset( (int)FMath::RandRange( -1, 1 ) * WeakPtr->LengthGenerateFruit, (int)FMath::RandRange( -1, 1 ) * WeakPtr->LengthGenerateFruit, WeakPtr->GetActorLocation().Z );
+		WeakPtr.Get()->GetWorld()->SpawnActor( WeakPtr.Get()->FruitCropClass, &GenOffset); // 랜덤 포지션 설정해야함
+
+	}), ThrowFruitDelayTime, false );
 }
 

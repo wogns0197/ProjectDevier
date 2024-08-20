@@ -13,7 +13,7 @@ enum class EOverlapObjectType
 };
 
 UENUM()
-enum class EInteractiveType
+enum class EInteractiveType // 우선순위 순서 유지 필요
 {
 	NONE = -1,
 

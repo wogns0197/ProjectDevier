@@ -67,6 +67,11 @@ void ADCharacter::BeginPlay()
 	if ( !m_pUIInventory && pUI ) {
 		m_pUIInventory = pUI;
 	}
+
+	for ( int i = 0; i < (int)EInteractiveType::COUNT; i++ )
+	{
+		m_mInteractiveArr.Add( EInteractiveType( i ), TArray<TWeakObjectPtr<ADInteractiveObject>>() );
+	}
 }
 
 void ADCharacter::Tick(float DeltaTime)
@@ -188,12 +193,6 @@ void ADCharacter::OnInteractivePressed()
 			CheckUnMovableState( InteractiveType );
 
 			auto GI = Cast<UDGameInstance>( UGameplayStatics::GetGameInstance( GetWorld() ) );
-			bool bInvenPreRet = GI->IsInventoryPuttable( WeakCurOverlapObject );
-			if ( !bInvenPreRet ) {
-				// 불가 채팅 메세지
-				return;
-			}
-
 			if ( WeakCurOverlapObject.IsValid() )
 			{
 				RotateToTarget( WeakCurOverlapObject->GetActorLocation() );
@@ -201,6 +200,12 @@ void ADCharacter::OnInteractivePressed()
 
 			if ( InteractiveType == EInteractiveType::Picking )
 			{
+				bool bInvenPreRet = GI->IsInventoryPuttable( WeakCurOverlapObject );
+				if ( !bInvenPreRet ) {
+					// 불가 채팅 메세지
+					return;
+				}
+
 				Anim_bPickable = true;
 				// PickObjectTime 이후에 타겟 오브젝트가 소켓에 붙도록 한다
 				GetWorldTimerManager().SetTimer( PickTimeHandler, FTimerDelegate::CreateLambda( [WeakThis = TWeakObjectPtr<ADCharacter>( this ) ]()
@@ -210,6 +215,17 @@ void ADCharacter::OnInteractivePressed()
 					FAttachmentTransformRules AttathRules( EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, false );
 					WeakThis.Get()->WeakCurOverlapObject->AttachToComponent( WeakThis.Get()->GetMesh(), AttathRules, "Fist_R_Socket" );
 				}), PickObjectTime, false);
+			}
+
+			else if ( InteractiveType == EInteractiveType::Trembling )
+			{
+				bool bAbleToTrembling = GI->IsAbleToTremble( WeakCurOverlapObject );
+				if ( !bAbleToTrembling ) {
+					// 불가 채팅 메세지
+					return;
+				}
+
+				WeakCurOverlapObject->OnStartInteractive();
 			}
 		}
 	}
@@ -262,10 +278,41 @@ void ADCharacter::UpdateInventory()
 	} ), DoubleMovementTimeOffset, false );
 }*/
 
+ADInteractiveObject* ADCharacter::GetRemainInteractObject()
+{
+	for ( auto& el : m_mInteractiveArr ) // Enum 순서가 곧 우선순위기 때문에 순서에 주의해야한다
+	{
+		if ( el.Value.Num() > 0 )
+		{
+			for ( const auto& elem : el.Value )
+			{
+				if ( elem.IsValid() )
+				{
+					return elem.Get();
+				}
+				else
+				{ // valid 안하면 바로 캇! 메모리 관리는 생명이다!
+					elem->MarkAsGarbage();
+					el.Value.Remove( elem );
+				}
+			}
+		}
+	}
+
+	return nullptr;
+}
+
 void ADCharacter::OnOverlapBegin( UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult )
 {
-	if ( ADInteractiveObject* InteractiveObj = Cast<ADInteractiveObject>( OtherActor) ) {
-		WeakCurOverlapObject = InteractiveObj;
+	// interact UI도 우선순위에 맞게 띄워야한다.
+	if ( ADInteractiveObject* InteractiveObj = Cast<ADInteractiveObject>( OtherActor) )
+	{
+		EInteractiveType Type = InteractiveObj->GetInteractiveType();
+		if ( Type == EInteractiveType::NONE ) return;
+
+		m_mInteractiveArr[Type].Emplace( InteractiveObj );
+
+		WeakCurOverlapObject = GetRemainInteractObject();
 		if ( auto hud = GetHud() ) {
 			hud->OpenUI( EUIType::UI_Interactive );
 		}
@@ -274,16 +321,25 @@ void ADCharacter::OnOverlapBegin( UPrimitiveComponent* OverlappedComp, AActor* O
 
 void ADCharacter::OnOverlapEnd( UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex )
 {
-	if ( WeakCurOverlapObject == OtherActor )
+	if ( ADInteractiveObject* InteractiveObj = Cast<ADInteractiveObject>( OtherActor ) )
 	{
-		if ( WeakCurOverlapObject.IsValid() && WeakCurOverlapObject->GetOverlapType() == EOverlapObjectType::Interactive )
-		{
-			if ( auto hud = GetHud() ) {
-				hud->CloseUI( EUIType::UI_Interactive );
-			}
-		}
+		EInteractiveType Type = InteractiveObj->GetInteractiveType();
+		if ( Type == EInteractiveType::NONE || Type == EInteractiveType::COUNT ) { return; }
 
-		WeakCurOverlapObject = nullptr;
+		m_mInteractiveArr[Type].Remove( InteractiveObj );
+
+		WeakCurOverlapObject = GetRemainInteractObject();
+	}
+
+	if ( WeakCurOverlapObject.IsValid() /*&& WeakCurOverlapObject->GetOverlapType() == EOverlapObjectType::Interactive */) // 부가 검사가 필요하나? 이미 위에서 오버랩으로 넣었는데
+	{
+		; // 계속 띄워둠
+	}
+	else
+	{
+		if ( auto hud = GetHud() ) {
+			hud->CloseUI( EUIType::UI_Interactive );
+		}
 	}
 }
 

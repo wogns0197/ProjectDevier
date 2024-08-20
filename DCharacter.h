@@ -57,6 +57,8 @@ public:
 	void SetIsPickStart( const bool v ) { Anim_bPickable = v; } // DAnimNotifyState에서 관리한다.
 
 	// 흠.. 오버랩되는 물체들이 한번에 여러개가 있지 않을까.. 맵으로 현재 오버랩타입을 관리하고픈데..
+	// 역시 여러개가 있게 되어 작업함
+	TMap<EInteractiveType, TArray<TWeakObjectPtr<class ADInteractiveObject>>> m_mInteractiveArr;
 	TWeakObjectPtr<class ADInteractiveObject> WeakCurOverlapObject;
 	class UAnimInstance* AnimInstance;
 
@@ -122,5 +124,6 @@ private:
 	void CheckUnMovableState( EInteractiveType InteractiveType /*분명 무언가 또 추가될 것임*/);
 
 	void SetFocusToMouseCursorAndShow( bool bFocus ); // UI 오픈 시 카메라가 마우스 움직임을 받을지 안받을지 + 커서 Show
+	class ADInteractiveObject* GetRemainInteractObject();
 
 };
