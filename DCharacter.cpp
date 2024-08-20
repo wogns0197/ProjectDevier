@@ -212,8 +212,9 @@ void ADCharacter::OnInteractivePressed()
 				{
 					if ( !WeakThis.IsValid() ) { return; }
 
+					WeakThis->WeakCurOverlapObject->SetPhysicsSimulate( false );
 					FAttachmentTransformRules AttathRules( EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, false );
-					WeakThis.Get()->WeakCurOverlapObject->AttachToComponent( WeakThis.Get()->GetMesh(), AttathRules, "Fist_R_Socket" );
+					WeakThis->WeakCurOverlapObject->AttachToComponent( WeakThis->GetMesh(), AttathRules, "Fist_R_Socket" );
 				}), PickObjectTime, false);
 			}
 

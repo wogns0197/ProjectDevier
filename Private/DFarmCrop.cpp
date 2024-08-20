@@ -4,7 +4,6 @@
 ADFarmCrop::ADFarmCrop()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
 }
 
 void ADFarmCrop::BeginPlay()
@@ -19,4 +18,3 @@ void ADFarmCrop::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 }
-

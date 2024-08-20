@@ -15,6 +15,10 @@ class PROJECTD_API ADInteractiveObject : public AActor
 public:
 	UPROPERTY(EditAnywhere, Category="ItemInfo")
 	int ItemID;
+	UPROPERTY(VisibleAnywhere)
+	class UStaticMeshComponent* StaticMeshComp;
+	UPROPERTY(VisibleAnywhere)
+	class USceneComponent* SceneComp;
 
 protected:
 	EOverlapObjectType OverlapType;
@@ -32,5 +36,6 @@ protected:
 public:	
 	virtual void Tick(float DeltaTime) override;
 	virtual void OnStartInteractive() {};
+	virtual void SetPhysicsSimulate( bool v );
 
 };
