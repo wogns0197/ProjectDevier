@@ -4,6 +4,11 @@
 ADFarmCrop::ADFarmCrop()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>( TEXT( "StaticMesh" ) );
+	if ( StaticMeshComp ) {
+		StaticMeshComp->SetupAttachment( RootComponent );
+	}
 }
 
 void ADFarmCrop::BeginPlay()
@@ -17,4 +22,11 @@ void ADFarmCrop::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void ADFarmCrop::SetPhysicsSimulate( bool v )
+{
+	if ( StaticMeshComp ) {
+		StaticMeshComp->SetSimulatePhysics( v );
+	}
 }

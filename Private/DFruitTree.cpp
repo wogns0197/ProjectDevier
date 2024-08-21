@@ -13,10 +13,10 @@ ADFruitTree::ADFruitTree()
 	
 	if ( USceneComponent* SceneComp = CreateDefaultSubobject<USceneComponent>( TEXT( "SceneComp" ) ) )
 	{
-		TreeStaticMesh = CreateDefaultSubobject<UStaticMeshComponent>( TEXT( "TreeStaticMesh" ) );
-		if ( TreeStaticMesh )
+		TreeSkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>( TEXT( "TreeStaticMesh" ) );
+		if ( TreeSkeletalMesh )
 		{
-			TreeStaticMesh->SetupAttachment( SceneComp );
+			TreeSkeletalMesh->SetupAttachment( SceneComp );
 
 			//TArray<UStaticMeshComponent*> FruitCompArr = { FruitStaticMesh_0, FruitStaticMesh_1, FruitStaticMesh_2, FruitStaticMesh_3, FruitStaticMesh_4 };
 			// 아니.. 배열로 관리하면 포인터만 살고 객체 안가리킴;;;; 역시 쉽게 되는 건 없다잉...

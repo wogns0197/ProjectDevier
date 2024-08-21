@@ -208,11 +208,11 @@ void ADCharacter::OnInteractivePressed()
 
 				Anim_bPickable = true;
 				// PickObjectTime 이후에 타겟 오브젝트가 소켓에 붙도록 한다
+				WeakCurOverlapObject->SetPhysicsSimulate( false );
 				GetWorldTimerManager().SetTimer( PickTimeHandler, FTimerDelegate::CreateLambda( [WeakThis = TWeakObjectPtr<ADCharacter>( this ) ]()
 				{
 					if ( !WeakThis.IsValid() ) { return; }
 
-					WeakThis->WeakCurOverlapObject->SetPhysicsSimulate( false );
 					FAttachmentTransformRules AttathRules( EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, false );
 					WeakThis->WeakCurOverlapObject->AttachToComponent( WeakThis->GetMesh(), AttathRules, "Fist_R_Socket" );
 				}), PickObjectTime, false);

@@ -27,7 +27,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UCapsuleComponent* BlockCapsuleComponent; // Ä³¸¯ÅÍ Block
 	UPROPERTY(EditAnywhere)
-	class UStaticMeshComponent* TreeStaticMesh;
+	class USkeletalMeshComponent * TreeSkeletalMesh;
 	UPROPERTY(EditAnywhere)
 	class UStaticMeshComponent* FruitStaticMesh_0;
 	UPROPERTY(EditAnywhere)
