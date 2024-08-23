@@ -10,8 +10,8 @@ class PROJECTD_API UDTreeAnimation : public UAnimInstance // ¿Ã∞≈ DAnimInstance∑
 	GENERATED_BODY()
 	
 public:
-	/*UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Anim Props")
-	bool bTremble;*/
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Anim Props")
+	bool bTremble;
 
 protected:
 	virtual void NativeInitializeAnimation() override;

@@ -42,22 +42,30 @@ void UDGameInstance::ProcessInteractive( EInteractiveType InType, TWeakObjectPtr
 	switch ( InType )
 	{
 	case EInteractiveType::Picking:
+	{
 		if ( InObject.IsValid() )
 		{
 			// 여기서 기본 갯수를 1로 하는데, 나중에 복수로 바꾸려면 인벤에 개별가방 칸당 복수처리가 되어야함 아래 코드가 굉장히 별로임
 			const int nItemID = InObject.Get()->GetItemID();
 			FInventoryProcessParam Item( EInventoryType( nItemID / 1000 ), true, nItemID, 1, 0 );
 			if ( !ProcessInventory( Item ) ) {
-				UE_LOG( LogTemp, Warning, TEXT("ProcessInventory Fail :: ItemID|%d|ActorClass|%s"), nItemID, *InObject->GetClass()->GetName() );
+				UE_LOG( LogTemp, Warning, TEXT( "ProcessInventory Fail :: ItemID|%d|ActorClass|%s" ), nItemID, *InObject->GetClass()->GetName() );
 			}
 
 			InObject->Destroy();
-			DelayedInteractDoneDelegate.Broadcast( InType );
 		}
 		break;
+	}
+	case EInteractiveType::Trembling:
+	{
+		// 나무 흔들기는 Obj Valid 안중요할 것 같아서 따로 안넣는다
+		// @TODO..
+	}
 	default:
 		break;
 	}
+
+	DelayedInteractDoneDelegate.Broadcast( InType );
 
 	// 인벤토리 작업
 }

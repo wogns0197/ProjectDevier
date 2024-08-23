@@ -42,10 +42,12 @@ private:
 	float dBaseWalkSpeed;
 	float dCurArmLength;
 	bool bPressingShift;
-	bool Anim_bPressingJump;
-	bool Anim_bPickable;
 	bool bAbleDoublePressedRun; // 움직이기 키 두번으로 뛸 수 있는 연타간 시간 간격 검사
 	bool bMoveable; // 캐릭터 무빙 잠금 (ex 줍기 시)
+
+	bool Anim_bPressingJump;
+	bool Anim_bPickable;
+	bool Anim_bPunching;
 
 	// 오브젝트 줍기 애님 중 땅에 손이 닿는 타이밍(사실 에님 노티파이로 하면 됨 ㅋㅋ;;)
 	FTimerHandle PickTimeHandler;
@@ -54,7 +56,11 @@ public:
 	const bool GetIsPressingShift() { return bPressingShift; }
 	const bool GetIsPressedJump() { return Anim_bPressingJump; }
 	const bool GetIsPickStart() { return Anim_bPickable; } // 주의* 애니메이션 Update에서 계속 바라보고 있음
-	void SetIsPickStart( const bool v ) { Anim_bPickable = v; } // DAnimNotifyState에서 관리한다.
+	const bool GetIsPunchStart() { return Anim_bPunching; } // 위와 동일
+
+public: // DAnimNotifyState에서 관리한다.
+	void SetIsPickStart( const bool v ) { Anim_bPickable = v; }
+	void SetIsPunching( const bool v ) { Anim_bPunching = v; }
 
 	// 흠.. 오버랩되는 물체들이 한번에 여러개가 있지 않을까.. 맵으로 현재 오버랩타입을 관리하고픈데..
 	// 역시 여러개가 있게 되어 작업함

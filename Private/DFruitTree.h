@@ -14,6 +14,8 @@ public:
 
 public:
 	UPROPERTY(EditAnywhere)
+	UAnimSequence* TremblingAnim;
+	UPROPERTY(EditAnywhere)
 	TSubclassOf<class ADFarmCrop> FruitCropClass;
 	UPROPERTY(EditAnywhere)
 	TSoftObjectPtr<UStaticMesh> FruitMeshClass;
@@ -21,13 +23,15 @@ public:
 	float ThrowFruitDelayTime; // Interact직후부터 과일떨어뜨리기까지 시간
 	UPROPERTY(EditAnywhere)
 	int LengthGenerateFruit; // 나무로부터 과일생성위치까지의 길이 ( 4방향 랜덤 )
+	UPROPERTY(EditAnywhere)
+	int HeightGenerateFruit; // 나무 높이가 다를 수 있어서 생성 높이를 지정해준다
 
 	UPROPERTY(EditAnywhere)
 	class UCapsuleComponent* OverlapCapsuleComponent; // 오버랩
 	UPROPERTY(EditAnywhere)
 	class UCapsuleComponent* BlockCapsuleComponent; // 캐릭터 Block
 	UPROPERTY(EditAnywhere)
-	class USkeletalMeshComponent * TreeSkeletalMesh;
+	class USkeletalMeshComponent* TreeSkeletalMesh;
 	UPROPERTY(EditAnywhere)
 	class UStaticMeshComponent* FruitStaticMesh_0;
 	UPROPERTY(EditAnywhere)

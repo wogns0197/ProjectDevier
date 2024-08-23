@@ -12,11 +12,15 @@ void UDAnimNotifyState::NotifyTick( USkeletalMeshComponent* MeshComp, UAnimSeque
 
 void UDAnimNotifyState::NotifyEnd( USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation )
 {
-	if ( Animation->GetName() == TEXT( "Anim_Pickup" ) )
+	if ( ADCharacter* pCharacter = Cast<ADCharacter>( MeshComp->GetOwner() ) )
 	{
-		if ( ADCharacter* pCharacter = Cast<ADCharacter>( MeshComp->GetOwner() ) )
-		{
-			pCharacter->OnNotifyAnimDone( EInteractiveType::Picking );
-		}
+		EInteractiveType BroadCastType = EInteractiveType::NONE;
+
+		if ( Animation->GetName() == TEXT( "Anim_Pickup" ) )
+			BroadCastType = EInteractiveType::Picking;
+		else if ( Animation->GetName() == TEXT( "Anim_Punching" ) ) // ÆÝÄ¡°¡ °ð Trembling
+			BroadCastType = EInteractiveType::Trembling;
+
+		pCharacter->OnNotifyAnimDone( BroadCastType );
 	}
 }

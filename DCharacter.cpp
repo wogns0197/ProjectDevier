@@ -208,14 +208,16 @@ void ADCharacter::OnInteractivePressed()
 
 				Anim_bPickable = true;
 				// PickObjectTime 이후에 타겟 오브젝트가 소켓에 붙도록 한다
+				// 속도가 양수인 오브젝트 (ex 떨어지고 있는 옵젝 )를 줍줍할때에는 바로 손에 붙인다
+				bool bDirectAttach = WeakCurOverlapObject->GetVelocity().X > 0 || WeakCurOverlapObject->GetVelocity().Y > 0 || WeakCurOverlapObject->GetVelocity().Z > 0;
 				WeakCurOverlapObject->SetPhysicsSimulate( false );
-				GetWorldTimerManager().SetTimer( PickTimeHandler, FTimerDelegate::CreateLambda( [WeakThis = TWeakObjectPtr<ADCharacter>( this ) ]()
+				GetWorldTimerManager().SetTimer( PickTimeHandler, FTimerDelegate::CreateLambda( [WeakThis = TWeakObjectPtr<ADCharacter>( this )]()
 				{
 					if ( !WeakThis.IsValid() ) { return; }
 
 					FAttachmentTransformRules AttathRules( EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, false );
 					WeakThis->WeakCurOverlapObject->AttachToComponent( WeakThis->GetMesh(), AttathRules, "Fist_R_Socket" );
-				}), PickObjectTime, false);
+				} ), bDirectAttach ? 0 : PickObjectTime, false );
 			}
 
 			else if ( InteractiveType == EInteractiveType::Trembling )
@@ -225,7 +227,7 @@ void ADCharacter::OnInteractivePressed()
 					// 불가 채팅 메세지
 					return;
 				}
-
+				Anim_bPunching = true;
 				WeakCurOverlapObject->OnStartInteractive();
 			}
 		}
@@ -346,17 +348,30 @@ void ADCharacter::OnOverlapEnd( UPrimitiveComponent* OverlappedComp, AActor* Oth
 
 void ADCharacter::OnNotifyAnimDone( EInteractiveType InType )
 {
-	if ( InType == EInteractiveType::Picking )
-	{
-		if ( auto GI = Cast<UDGameInstance>( UGameplayStatics::GetGameInstance( GetWorld() ) ) )
-		{
-			Anim_bPickable = false;
-			if ( !WeakCurOverlapObject.IsValid() ) {
-				return;
-			}
+	auto GI = Cast<UDGameInstance>( UGameplayStatics::GetGameInstance( GetWorld() ) );
+	GI->ProcessInteractive( InType, WeakCurOverlapObject );
 
-			GI->ProcessInteractive( EInteractiveType::Picking, WeakCurOverlapObject );
+	switch ( InType )
+	{
+	case EInteractiveType::NONE:
+		break;
+	case EInteractiveType::Picking:
+	{
+		Anim_bPickable = false;
+		if ( !WeakCurOverlapObject.IsValid() ) {
+			return;
 		}
+		break;
+	}
+	case EInteractiveType::Trembling:
+	{
+		Anim_bPunching = false;
+		break;
+	}
+	case EInteractiveType::COUNT:
+		break;
+	default:
+		break;
 	}
 }
 
@@ -367,6 +382,7 @@ void ADCharacter::OnInteractiveProcessDone( EInteractiveType InType )
 		switch ( InType )
 		{
 		case EInteractiveType::Picking:
+		case EInteractiveType::Trembling:
 			bMoveable = true;
 			break;
 		default:
@@ -400,8 +416,9 @@ void ADCharacter::CheckUnMovableState( EInteractiveType InteractiveType )
 	switch ( InteractiveType )
 	{
 		case EInteractiveType::Picking:
+		case EInteractiveType::Trembling:
 		{
-			// 줍기 중에는 움직일 수 없다.
+			// 줍기 중에는 움직일 수 없다. 흔들기 포함.
 			bMoveable = false;
 		}
 			break;

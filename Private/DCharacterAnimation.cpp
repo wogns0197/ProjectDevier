@@ -20,6 +20,7 @@ void UDCharacterAnimation::UpdateAnimProps()
 	IsJumping();
 	IsFalling();
 	IsPicking();
+	IsPunching();
 }
 
 void UDCharacterAnimation::IsWalking()
@@ -59,6 +60,14 @@ void UDCharacterAnimation::IsPicking()
 	if ( ADCharacter* pCharacter = GetCharacter() )
 	{
 		bPicking = pCharacter->GetIsPickStart();
+	}
+}
+
+void UDCharacterAnimation::IsPunching()
+{
+	if ( ADCharacter* pCharacter = GetCharacter() )
+	{
+		bPunching = pCharacter->GetIsPunchStart();
 	}
 }
 

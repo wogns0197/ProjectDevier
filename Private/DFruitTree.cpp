@@ -60,11 +60,18 @@ void ADFruitTree::Tick(float DeltaTime)
 
 void ADFruitTree::OnStartInteractive()
 {
+	if ( TreeSkeletalMesh && TremblingAnim )
+		TreeSkeletalMesh->PlayAnimation( TremblingAnim, false ); // BP로 빼야할듯 SingleNodeInstance가 null임;
+
 	checkf( LengthGenerateFruit > 0, TEXT( "LengthGenerateFruit is Zero" ) );
 	GetWorld()->GetTimerManager().SetTimer( ThrowTimeHanle, FTimerDelegate::CreateLambda( [WeakPtr = TWeakObjectPtr<ADFruitTree>( this )]() {
 		if ( !WeakPtr.IsValid() ) { return; }
 
-		const FVector GenOffset( (int)FMath::RandRange( -1, 1 ) * WeakPtr->LengthGenerateFruit, (int)FMath::RandRange( -1, 1 ) * WeakPtr->LengthGenerateFruit, WeakPtr->GetActorLocation().Z );
+		const FVector& ActorLoc = WeakPtr->GetActorLocation();
+		const FVector GenOffset(
+			ActorLoc.X + (FMath::RandRange( -2, 1 ) > 0 ? 1 : -1) * WeakPtr->LengthGenerateFruit,
+			ActorLoc.Y + (FMath::RandRange( -2, 1 ) > 0 ? 1 : -1) * WeakPtr->LengthGenerateFruit,
+			WeakPtr->HeightGenerateFruit );
 		WeakPtr.Get()->GetWorld()->SpawnActor( WeakPtr.Get()->FruitCropClass, &GenOffset); // 랜덤 포지션 설정해야함
 
 	}), ThrowFruitDelayTime, false );

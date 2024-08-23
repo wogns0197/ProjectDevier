@@ -24,6 +24,8 @@ public:
 	bool bFalling;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Anim Props")
 	bool bPicking;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Anim Props")
+	bool bPunching;
 
 public:
 	UFUNCTION(BlueprintCallable , Category="Anim Func")
@@ -34,6 +36,7 @@ public:
 	void IsJumping();
 	void IsFalling();
 	void IsPicking();
+	void IsPunching();
 
 
 private:
