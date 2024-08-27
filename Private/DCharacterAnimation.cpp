@@ -27,7 +27,7 @@ void UDCharacterAnimation::IsWalking()
 {
 	if ( ADCharacter* pCharacter = GetCharacter() )
 	{
-		bWalking = pCharacter->GetVelocity().X != 0.f || pCharacter->GetVelocity().Y != 0.f;
+		bWalking = pCharacter->GetVelocity().X != 0.f || pCharacter->GetVelocity().Y != 0.f || pCharacter->GetIsWaking();
 	}
 }
 

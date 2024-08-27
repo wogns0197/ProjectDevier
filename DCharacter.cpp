@@ -51,6 +51,7 @@ void ADCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	bAbleDoublePressedRun = false;
+	Anim_Walking = false;
 	bMoveable = true;
 	dBaseWalkSpeed = GetCharacterMovement()->MaxWalkSpeed;
 
@@ -81,6 +82,20 @@ void ADCharacter::Tick(float DeltaTime)
 	if ( SpringArmComponent )
 	{
 		SpringArmComponent->TargetArmLength = FMath::FInterpTo(SpringArmComponent->TargetArmLength, dCurArmLength, DeltaTime, ZoomSpeed);
+	}
+
+	if ( Anim_Walking )
+	{
+		MoveToTargetElapsedTime += DeltaTime;
+		if ( MoveToTargetElapsedTime < WalkToTargetTime )
+		{
+			float MoveAlpha = DeltaTime / WalkToTargetTime;
+			FVector NewLoc = FMath::Lerp( MoveToTargetStartVec, MoveToTargetStartVec, MoveAlpha );
+			SetActorLocation( NewLoc );
+		}
+		else {
+			OnMoveToTargetDone();
+		}
 	}
 }
 
@@ -227,8 +242,11 @@ void ADCharacter::OnInteractivePressed()
 					// 불가 채팅 메세지
 					return;
 				}
-				Anim_bPunching = true;
-				WeakCurOverlapObject->OnStartInteractive();
+
+				MoveToTarget( WeakCurOverlapObject, Anim_bPunching );
+
+				//Anim_bPunching = true;
+				//WeakCurOverlapObject->OnStartInteractive();
 			}
 		}
 	}
@@ -408,6 +426,65 @@ void ADCharacter::RotateToDirection( FVector RotVec )
 		FRotator NewRot = FQuat::Slerp( FQuat( CurRot ), FQuat( TargetRot ), RotSpeed * GetWorld()->GetDeltaSeconds() ).Rotator();
 
 		SetActorRotation( NewRot );
+	}
+}
+
+void ADCharacter::MoveToTarget( TWeakObjectPtr<ADInteractiveObject> TargetObj, bool& InAnimBoolAddr )
+{
+	if ( !TargetObj.IsValid() ) {
+		return;
+	}
+
+	MoveToTargetFinishVec = GetClosetDistanceToTarget( TargetObj.Get() );
+	MoveToTargetElapsedTime = 0;
+	AnimBooladdr = &InAnimBoolAddr;
+	MoveTargetObject = TargetObj;
+	Anim_Walking = true; // Goto Tick
+}
+
+FVector ADCharacter::GetClosetDistanceToTarget( AActor* Obj )
+{
+	// 거리가 충분히 된다 하더라도 구조와 흐름을 일관되게 유지하도록 딱히 처리를 하지 않음
+	FVector vRet = FVector::ZeroVector;
+	if ( !Obj )
+		return vRet;
+
+	if ( ADInteractiveObject* IntaractObj = Cast<ADInteractiveObject>( Obj ) )
+	{
+		const int distance = IntaractObj->GetInteractableDistance();
+		FVector CurPos = GetActorLocation();
+		FVector TargetPos = Obj->GetActorLocation();
+		CurPos.Z = 0; // Z좌표는 무시하고 단순 길이만
+		TargetPos.Z = 0;
+
+		FVector Dir = CurPos - TargetPos;
+		Dir.Normalize(); // 방향 얻어서
+
+		const FVector& CloseA = CurPos + Dir * distance;
+		const FVector& CloseB = TargetPos + Dir * distance;
+
+		if ( FVector::Dist( CloseA, CurPos ) < FVector::Dist( CloseB, CurPos ) ) { // 둘중 캐릭터에 가까운걸로 리턴
+			vRet = CloseA;
+		}
+		else {
+			vRet = CloseB;
+		}
+	}
+
+	return vRet;
+}
+
+void ADCharacter::OnMoveToTargetDone()
+{
+	Anim_Walking = false;
+	*AnimBooladdr = true;
+	MoveToTargetStartVec = FVector::ZeroVector;
+	MoveToTargetFinishVec = FVector::ZeroVector;
+	MoveToTargetElapsedTime = 0.f;
+
+	if ( MoveTargetObject.IsValid() )
+	{
+		MoveTargetObject->OnStartInteractive();
 	}
 }
 

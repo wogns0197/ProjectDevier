@@ -28,6 +28,8 @@ public:
 	float DoubleMovementTimeOffset; // 이동키 연타 판별 시간
 	UPROPERTY(EditAnywhere, Category="MovementSetting")
 	float PickObjectTime; // 줍기 애님 직후 이 시간이 지나야 오브젝트가 캐릭터 소켓에 붙는다.
+	UPROPERTY(EditAnywhere, Category="MovementSetting")
+	float WalkToTargetTime; // 특정 타겟으로 걸어가기까지의 시간
 
 	UPROPERTY(EditAnywhere, Category="SpringArmSetting")
 	float ZoomDelta;
@@ -45,9 +47,16 @@ private:
 	bool bAbleDoublePressedRun; // 움직이기 키 두번으로 뛸 수 있는 연타간 시간 간격 검사
 	bool bMoveable; // 캐릭터 무빙 잠금 (ex 줍기 시)
 
+	float MoveToTargetElapsedTime; // 아으 기능별로 묶을걸..담부턴 기능별로 한정자 묶자
+	FVector MoveToTargetStartVec;
+	FVector MoveToTargetFinishVec;
+	bool* AnimBooladdr; // 함수에 Animbool 주솟값으로 던져주고 나중에 플래그 올려주는데 더 좋은 방법이 없을까.. enum으로 애니메이션을 관리해야할까..
+	TWeakObjectPtr<class ADInteractiveObject> MoveTargetObject;
+
 	bool Anim_bPressingJump;
 	bool Anim_bPickable;
 	bool Anim_bPunching;
+	bool Anim_Walking; // 걷기 애니메이션은 기본적으로 속도로 판별하나, 코드에서 직접 캐릭터를 움직일 때가 있어서 강제로 애님을 부여할때만 사용
 
 	// 오브젝트 줍기 애님 중 땅에 손이 닿는 타이밍(사실 에님 노티파이로 하면 됨 ㅋㅋ;;)
 	FTimerHandle PickTimeHandler;
@@ -57,6 +66,7 @@ public:
 	const bool GetIsPressedJump() { return Anim_bPressingJump; }
 	const bool GetIsPickStart() { return Anim_bPickable; } // 주의* 애니메이션 Update에서 계속 바라보고 있음
 	const bool GetIsPunchStart() { return Anim_bPunching; } // 위와 동일
+	const bool GetIsWaking() { return Anim_Walking; } // 강제로 코드로 움직일 때만 사용
 
 public: // DAnimNotifyState에서 관리한다.
 	void SetIsPickStart( const bool v ) { Anim_bPickable = v; }
@@ -122,11 +132,15 @@ public:
 	void OnNotifyAnimDone( EInteractiveType InType );
 	UFUNCTION()
 	void OnInteractiveProcessDone(EInteractiveType InType);
+	UFUNCTION()
+	void OnMoveToTargetDone();
 
 private:
 	class ADHUDBase* ADCharacter::GetHud();
 	void RotateToTarget( FVector vec );
 	void RotateToDirection( FVector RotVec );
+	void MoveToTarget( TWeakObjectPtr<class ADInteractiveObject> TargetObj, bool& InAnimBoolAddr );
+	FVector GetClosetDistanceToTarget( AActor* Obj ); // 다른 액터에도 쓰일 것 같아서 함수 안에서 캐스팅해서 쓰도록함
 	void CheckUnMovableState( EInteractiveType InteractiveType /*분명 무언가 또 추가될 것임*/);
 
 	void SetFocusToMouseCursorAndShow( bool bFocus ); // UI 오픈 시 카메라가 마우스 움직임을 받을지 안받을지 + 커서 Show
