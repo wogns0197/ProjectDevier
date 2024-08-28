@@ -186,6 +186,11 @@ void ADCharacter::OnInteractivePressed()
 	// 인터랙트를 담당하는 매니저를 따로 둘 것인가? 아니면 캐릭터단에서 다 처리할 것인가?
 	// 채집, 낚시, 등등 너무 많은데 매니저에서 관리하고 인터랙트 시 캐릭터, 오브젝트에 둘다 델리게이트로 신호 주는게 나을 듯..
 	// -> GameInstance에서 처리하도록 하자
+
+	if ( !bMoveable ) { // 인터랙트 도중 인터랙트가 겹치는 것 방지
+		return;
+	}
+
 	if ( WeakCurOverlapObject.IsValid() )
 	{
 		if ( WeakCurOverlapObject.Get()->GetOverlapType() == EOverlapObjectType::Interactive )
@@ -379,17 +384,14 @@ void ADCharacter::OnNotifyAnimDone( EInteractiveType InType )
 
 void ADCharacter::OnInteractiveProcessDone( EInteractiveType InType )
 {
-	if ( !bMoveable )
+	switch ( InType )
 	{
-		switch ( InType )
-		{
-		case EInteractiveType::Picking:
-		case EInteractiveType::Trembling:
-			bMoveable = true;
-			break;
-		default:
-			break;
-		}
+	case EInteractiveType::Picking:
+	case EInteractiveType::Trembling:
+		bMoveable = true;
+		break;
+	default:
+		break;
 	}
 }
 void ADCharacter::RotateToTarget( FVector vec )
