@@ -28,8 +28,8 @@ public:
 	float DoubleMovementTimeOffset; // 이동키 연타 판별 시간
 	UPROPERTY(EditAnywhere, Category="MovementSetting")
 	float PickObjectTime; // 줍기 애님 직후 이 시간이 지나야 오브젝트가 캐릭터 소켓에 붙는다.
-	UPROPERTY(EditAnywhere, Category="MovementSetting")
-	float WalkToTargetTime; // 특정 타겟으로 걸어가기까지의 시간
+	//UPROPERTY(EditAnywhere, Category="MovementSetting")
+	//float WalkToTargetTime; // 특정 타겟으로 걸어가기까지의 시간 : 시간으로 하면 안된다. 속도와 거리로 해야함
 
 	UPROPERTY(EditAnywhere, Category="SpringArmSetting")
 	float ZoomDelta;
@@ -47,11 +47,12 @@ private:
 	bool bAbleDoublePressedRun; // 움직이기 키 두번으로 뛸 수 있는 연타간 시간 간격 검사
 	bool bMoveable; // 캐릭터 무빙 잠금 (ex 줍기 시)
 
-	float MoveToTargetElapsedTime; // 아으 기능별로 묶을걸..담부턴 기능별로 한정자 묶자
-	FVector MoveToTargetStartVec;
-	FVector MoveToTargetFinishVec;
-	bool* AnimBooladdr; // 함수에 Animbool 주솟값으로 던져주고 나중에 플래그 올려주는데 더 좋은 방법이 없을까.. enum으로 애니메이션을 관리해야할까..
-	TWeakObjectPtr<class ADInteractiveObject> MoveTargetObject;
+	// 삭제예정 : 마우스 클릭 이동으로 바꾼 다음 구현해야함
+	//float MoveToTargetElapsedTime; // 아으 기능별로 묶을걸..담부턴 기능별로 한정자 묶자
+	//FVector MoveToTargetStartVec;
+	//FVector MoveToTargetFinishVec;
+	//bool* AnimBooladdr; // 함수에 Animbool 주솟값으로 던져주고 나중에 플래그 올려주는데 더 좋은 방법이 없을까.. enum으로 애니메이션을 관리해야할까..
+	//TWeakObjectPtr<class ADInteractiveObject> MoveTargetObject;
 
 	bool Anim_bPressingJump;
 	bool Anim_bPickable;
@@ -132,8 +133,6 @@ public:
 	void OnNotifyAnimDone( EInteractiveType InType );
 	UFUNCTION()
 	void OnInteractiveProcessDone(EInteractiveType InType);
-	UFUNCTION()
-	void OnMoveToTargetDone();
 
 private:
 	class ADHUDBase* ADCharacter::GetHud();

@@ -83,20 +83,6 @@ void ADCharacter::Tick(float DeltaTime)
 	{
 		SpringArmComponent->TargetArmLength = FMath::FInterpTo(SpringArmComponent->TargetArmLength, dCurArmLength, DeltaTime, ZoomSpeed);
 	}
-
-	if ( Anim_Walking )
-	{
-		MoveToTargetElapsedTime += DeltaTime;
-		if ( MoveToTargetElapsedTime < WalkToTargetTime )
-		{
-			float MoveAlpha = DeltaTime / WalkToTargetTime;
-			FVector NewLoc = FMath::Lerp( MoveToTargetStartVec, MoveToTargetStartVec, MoveAlpha );
-			SetActorLocation( NewLoc );
-		}
-		else {
-			OnMoveToTargetDone();
-		}
-	}
 }
 
 void ADCharacter::SetupPlayerInputComponent( UInputComponent* PlayerInputComponent )
@@ -243,10 +229,8 @@ void ADCharacter::OnInteractivePressed()
 					return;
 				}
 
-				MoveToTarget( WeakCurOverlapObject, Anim_bPunching );
-
-				//Anim_bPunching = true;
-				//WeakCurOverlapObject->OnStartInteractive();
+				Anim_bPunching = true;
+				WeakCurOverlapObject->OnStartInteractive();
 			}
 		}
 	}
@@ -431,15 +415,16 @@ void ADCharacter::RotateToDirection( FVector RotVec )
 
 void ADCharacter::MoveToTarget( TWeakObjectPtr<ADInteractiveObject> TargetObj, bool& InAnimBoolAddr )
 {
-	if ( !TargetObj.IsValid() ) {
-		return;
-	}
+	// 이렇게 하면 안되는 것 같다..
+	//if ( !TargetObj.IsValid() ) {
+	//	return;
+	//}
 
-	MoveToTargetFinishVec = GetClosetDistanceToTarget( TargetObj.Get() );
-	MoveToTargetElapsedTime = 0;
-	AnimBooladdr = &InAnimBoolAddr;
-	MoveTargetObject = TargetObj;
-	Anim_Walking = true; // Goto Tick
+	//MoveToTargetFinishVec = GetClosetDistanceToTarget( TargetObj.Get() );
+	//MoveToTargetElapsedTime = 0;
+	//AnimBooladdr = &InAnimBoolAddr;
+	//MoveTargetObject = TargetObj;
+	//Anim_Walking = true; // Goto Tick
 }
 
 FVector ADCharacter::GetClosetDistanceToTarget( AActor* Obj )
@@ -472,20 +457,6 @@ FVector ADCharacter::GetClosetDistanceToTarget( AActor* Obj )
 	}
 
 	return vRet;
-}
-
-void ADCharacter::OnMoveToTargetDone()
-{
-	Anim_Walking = false;
-	*AnimBooladdr = true;
-	MoveToTargetStartVec = FVector::ZeroVector;
-	MoveToTargetFinishVec = FVector::ZeroVector;
-	MoveToTargetElapsedTime = 0.f;
-
-	if ( MoveTargetObject.IsValid() )
-	{
-		MoveTargetObject->OnStartInteractive();
-	}
 }
 
 void ADCharacter::CheckUnMovableState( EInteractiveType InteractiveType )
