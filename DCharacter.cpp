@@ -52,7 +52,7 @@ void ADCharacter::BeginPlay()
 	Super::BeginPlay();
 	bAbleDoublePressedRun = false;
 	Anim_Walking = false;
-	bMoveable = true;
+	bMovable = true;
 	dBaseWalkSpeed = GetCharacterMovement()->MaxWalkSpeed;
 
 	AnimInstance = Cast<UAnimInstance>( GetMesh()->GetAnimClass() );
@@ -117,7 +117,7 @@ void ADCharacter::Turn( float v )
 
 void ADCharacter::MoveForward( float v )
 {
-	if ( v != 0.f && bMoveable )
+	if ( v != 0.f && bMovable )
 	{
 		FVector ForwardDir = CameraComponent->GetForwardVector();
 		ForwardDir.Z = 0;
@@ -129,7 +129,7 @@ void ADCharacter::MoveForward( float v )
 
 void ADCharacter::MoveRight( float v )
 {
-	if ( v != 0.f && bMoveable )
+	if ( v != 0.f && bMovable )
 	{
 		FVector RightDir = CameraComponent->GetRightVector();
 		RightDir.Z = 0;
@@ -187,7 +187,7 @@ void ADCharacter::OnInteractivePressed()
 	// 채집, 낚시, 등등 너무 많은데 매니저에서 관리하고 인터랙트 시 캐릭터, 오브젝트에 둘다 델리게이트로 신호 주는게 나을 듯..
 	// -> GameInstance에서 처리하도록 하자
 
-	if ( !bMoveable ) { // 인터랙트 도중 인터랙트가 겹치는 것 방지
+	if ( !bMovable ) { // 인터랙트 도중 인터랙트가 겹치는 것 방지
 		return;
 	}
 
@@ -388,7 +388,10 @@ void ADCharacter::OnInteractiveProcessDone( EInteractiveType InType )
 	{
 	case EInteractiveType::Picking:
 	case EInteractiveType::Trembling:
-		bMoveable = true;
+		GetWorld()->GetTimerManager().SetTimer( InteractLockTimer, FTimerDelegate::CreateLambda( [WeakThis = TWeakObjectPtr<ADCharacter>( this )] {
+			if ( !WeakThis.IsValid() ) { return; }
+			WeakThis->bMovable = true;
+		} ), 0.3f, false );
 		break;
 	default:
 		break;
@@ -469,7 +472,7 @@ void ADCharacter::CheckUnMovableState( EInteractiveType InteractiveType )
 		case EInteractiveType::Trembling:
 		{
 			// 줍기 중에는 움직일 수 없다. 흔들기 포함.
-			bMoveable = false;
+			bMovable = false;
 		}
 			break;
 		default:

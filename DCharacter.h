@@ -45,7 +45,7 @@ private:
 	float dCurArmLength;
 	bool bPressingShift;
 	bool bAbleDoublePressedRun; // 움직이기 키 두번으로 뛸 수 있는 연타간 시간 간격 검사
-	bool bMoveable; // 캐릭터 무빙 잠금 (ex 줍기 시)
+	bool bMovable; // 캐릭터 무빙 잠금 (ex 줍기 시)
 
 	// 삭제예정 : 마우스 클릭 이동으로 바꾼 다음 구현해야함
 	//float MoveToTargetElapsedTime; // 아으 기능별로 묶을걸..담부턴 기능별로 한정자 묶자
@@ -58,6 +58,7 @@ private:
 	bool Anim_bPickable;
 	bool Anim_bPunching;
 	bool Anim_Walking; // 걷기 애니메이션은 기본적으로 속도로 판별하나, 코드에서 직접 캐릭터를 움직일 때가 있어서 강제로 애님을 부여할때만 사용
+	FTimerHandle InteractLockTimer; // 애니메이션 종류 직후 애니메이션이 바로 다시 실행되는 것에 시간차를 둠
 
 	// 오브젝트 줍기 애님 중 땅에 손이 닿는 타이밍(사실 에님 노티파이로 하면 됨 ㅋㅋ;;)
 	FTimerHandle PickTimeHandler;
