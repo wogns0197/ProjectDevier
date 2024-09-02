@@ -216,6 +216,7 @@ void ADCharacter::OnInteractivePressed()
 				// PickObjectTime 이후에 타겟 오브젝트가 소켓에 붙도록 한다
 				// 속도가 양수인 오브젝트 (ex 떨어지고 있는 옵젝 )를 줍줍할때에는 바로 손에 붙인다
 				bool bDirectAttach = WeakCurOverlapObject->GetVelocity().X > 0 || WeakCurOverlapObject->GetVelocity().Y > 0 || WeakCurOverlapObject->GetVelocity().Z > 0;
+				// 속도를 0으로 고정한다음 피직스를 꺼야될 듯하다
 				WeakCurOverlapObject->SetPhysicsSimulate( false );
 				GetWorldTimerManager().SetTimer( PickTimeHandler, FTimerDelegate::CreateLambda( [WeakThis = TWeakObjectPtr<ADCharacter>( this )]()
 				{
