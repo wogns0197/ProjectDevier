@@ -60,24 +60,28 @@ struct FItemBaseInfo
 	FItemBaseInfo() : ItemName( FText::GetEmpty() ), ToolTip( FText::GetEmpty() ), Price( 99 ), ExpireDate( FDateTime( 2079, 1, 1, 12, 59, 59 ) ) {};
 };
 
-UCLASS()
+static UDInventoryManagerSubSystem* _instance;
+
+UCLASS(Blueprintable)
 class PROJECTD_API UDInventoryManagerSubSystem : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
 
 public:
-	static UDInventoryManagerSubSystem* GetInstance() { return _instance; }
-	static UDInventoryManagerSubSystem* _instance;
+	void Init( const int nCountByType, const TMap<EInventoryType, int>& mMaxCountByType );
+	virtual void Initialize( FSubsystemCollectionBase& Collection ) override;
+	virtual void Deinitialize() override;
+
+	static UDInventoryManagerSubSystem* GetInstance();
+
 
 public:
-	UPROPERTY(EditAnywhere)
-	int InventoryCountByType; // 타입별 최대 가방 칸 개수
-	UPROPERTY(EditAnywhere)
-	TMap<EInventoryType, int> MaxCountByBagItem; // 타입별 아이템 한 칸당 최대 Num
-
+	int InventoryCountByType;
+	TMap<EInventoryType, int> MaxCountByBagItem;
 	UPROPERTY(EditAnywhere)
 	TMap<int, FItemBaseInfo> m_mItemInfo;
 
+private:
 	TArray<TArray<FInventoryItem>> m_Inventory;
 	TMap<int, UTexture2D*> ThumbnailsArr;
 
@@ -85,9 +89,6 @@ public:
 	EInventoryType LastInventoryUIBagType; // 인벤토리를 다시 열 때 이전에 닫았던 탭으로 다시 열어줌
 	
 public:
-	virtual void Initialize( FSubsystemCollectionBase& Collection ) override;
-	virtual void Deinitialize() override;
-
 	bool IsInventoryPuttable( TWeakObjectPtr<class ADInteractiveObject> InWeakPtr ); // 인벤 자리 있는지, 인벤에 넣을 수 있는 객체인지 동시 검사
 		// ONLY CALL FROM INVENTORY!! 객체 관리를 아주 제한적으로 하고싶기 때문에 인벤토리에서만 어쩔 수 없이 가져온다.
 	const TArray<FInventoryItem>& GetInventoryBag( EInventoryType Type ) { return m_Inventory[(int)Type]; }
@@ -95,9 +96,9 @@ public:
 
 public:
 	bool ProcessInventory( const FInventoryProcessParam& Param );
+	void LoadAllTexturesInDirectory( const FString& Directory );
 
 private:
-	void LoadAllTexturesInDirectory( const FString& Directory );
 	void LoadSpriteAsync( const FString& AssetPath );
 	void UpdateInventory();
 };

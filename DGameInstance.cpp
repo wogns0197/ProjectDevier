@@ -9,6 +9,10 @@
 void UDGameInstance::Init()
 {
 	Super::Init();
+
+	auto pInvenMgr = UDInventoryManagerSubSystem::GetInstance();
+	if ( pInvenMgr )
+		pInvenMgr->Init( InventoryCountByType, MaxCountByBagItem );
 }
 
 void UDGameInstance::InitCharacterData( ADCharacter* pOwnCharacter )

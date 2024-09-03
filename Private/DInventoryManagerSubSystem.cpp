@@ -6,9 +6,11 @@
 #include "DUIInventory.h"
 #include "../DHUDBase.h"
 
-void UDInventoryManagerSubSystem::Initialize( FSubsystemCollectionBase& Collection )
+void UDInventoryManagerSubSystem::Init( const int nCountByType, const TMap<EInventoryType, int>& mMaxCountByType )
 {
-	_instance = this;
+	InventoryCountByType = nCountByType;
+	MaxCountByBagItem = mMaxCountByType;
+
 
 	m_Inventory.Init( TArray<FInventoryItem>(), 5 );
 	for ( int i = 0; i < (int)EInventoryType::COUNT; ++i )
@@ -18,17 +20,23 @@ void UDInventoryManagerSubSystem::Initialize( FSubsystemCollectionBase& Collecti
 			m_Inventory[i].Emplace(FInventoryItem(0, 0));
 		}
 	}
+}
 
-	//test
-	m_Inventory[2][0].ItemID = 2001;
-	m_Inventory[2][0].Num = 1;
-	//test
+UDInventoryManagerSubSystem* UDInventoryManagerSubSystem::GetInstance()
+{
+	return _instance;
+}
 
+void UDInventoryManagerSubSystem::Initialize( FSubsystemCollectionBase& Collection )
+{
+	Super::Initialize( Collection );
+	_instance = this;
 	LoadAllTexturesInDirectory( FPaths::ProjectContentDir() + "/Resources/Thumbnail/Srpite" );
 }
 
 void UDInventoryManagerSubSystem::Deinitialize()
 {
+	Super::Deinitialize();
 }
 
 bool UDInventoryManagerSubSystem::IsInventoryPuttable( TWeakObjectPtr<ADInteractiveObject> InWeakPtr )
