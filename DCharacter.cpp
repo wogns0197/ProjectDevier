@@ -4,6 +4,7 @@
 #include "DHUDBase.h"
 #include "DPlayerController.h"
 #include "../DGameInstance.h"
+#include "DInventoryManagerSubSystem.h"
 #include "DUIInventory.h"
 
 #include "Animation/AnimInstance.h"
@@ -62,11 +63,6 @@ void ADCharacter::BeginPlay()
 	{
 		gi->InitCharacterData( this );
 		gi->DelayedInteractDoneDelegate.AddDynamic( this, &ADCharacter::OnInteractiveProcessDone );
-	}
-
-	auto pUI = Cast<UDUIInventory>( GetHud()->GetUI(EUIType::UI_Inventory));
-	if ( !m_pUIInventory && pUI ) {
-		m_pUIInventory = pUI;
 	}
 
 	for ( int i = 0; i < (int)EInteractiveType::COUNT; i++ )
@@ -199,6 +195,8 @@ void ADCharacter::OnInteractivePressed()
 			CheckUnMovableState( InteractiveType );
 
 			auto GI = Cast<UDGameInstance>( UGameplayStatics::GetGameInstance( GetWorld() ) );
+			auto InvenMgr = UDInventoryManagerSubSystem::GetInstance();
+
 			if ( WeakCurOverlapObject.IsValid() )
 			{
 				RotateToTarget( WeakCurOverlapObject->GetActorLocation() );
@@ -206,7 +204,7 @@ void ADCharacter::OnInteractivePressed()
 
 			if ( InteractiveType == EInteractiveType::Picking )
 			{
-				bool bInvenPreRet = GI->IsInventoryPuttable( WeakCurOverlapObject );
+				bool bInvenPreRet = InvenMgr->IsInventoryPuttable( WeakCurOverlapObject );
 				if ( !bInvenPreRet ) {
 					// 불가 채팅 메세지
 					return;
@@ -261,9 +259,7 @@ void ADCharacter::OnInventoryKeyPressed()
 
 void ADCharacter::UpdateInventory()
 {
-	if ( m_pUIInventory ) {
-		m_pUIInventory->UpdateTypeBag();
-	}
+	;
 }
 
 /*void ADCharacter::OnPressedMoveD()

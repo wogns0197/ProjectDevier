@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
-#include "../DGameInstance.h"
+#include "DInventoryManagerSubSystem.h"
 #include "UInventoryItemData.generated.h"
 
 

@@ -1,11 +1,11 @@
 #include "DUIInventoryItem.h"
-#include "../DGameInstance.h"
 #include "Engine/Texture2D.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/Overlay.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "UInventoryItemData.h"
+#include "DInventoryManagerSubSystem.h"
 
 void UDUIInventoryItem::NativeConstruct()
 {
@@ -30,9 +30,10 @@ void UDUIInventoryItem::NativeOnListItemObjectSet( UObject* ListItemObject )
 	{
 		SetBackgroundEmpty( false );
 		// sprite atlas 사용해서 드로우콜, 로드 줄이자
-		UDGameInstance* GI = Cast<UDGameInstance >( UGameplayStatics::GetGameInstance(GetWorld()) );
+		auto InvenMgr = UDInventoryManagerSubSystem::GetInstance();
+
 		FSlateBrush Brush;
-		Brush.SetResourceObject( GI->GetThumbnail( InvenInfo.ItemID ) );
+		Brush.SetResourceObject( InvenMgr->GetThumbnail( InvenInfo.ItemID ) );
 		Image_Item->SetBrush( Brush );
 		bSetData = true;
 		/*if ( TextureAsset.Succeeded() )

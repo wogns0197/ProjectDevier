@@ -39,7 +39,12 @@ protected:
 	TMap<EUIType, UUserWidget*> UITrunk;
 		
 public:
-	UUserWidget* GetUI( EUIType InType ) { return UITrunk[InType]; }
+	template<typename T>
+	T* GetUI( EUIType InType )
+	{
+		return Cast<T>( UITrunk[InType] );
+	}
+
 	UUserWidget* OpenUI( EUIType InType );
 	bool IsUIOpened( EUIType InType );
 	void CloseUI( EUIType InType );

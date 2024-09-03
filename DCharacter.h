@@ -84,8 +84,6 @@ public: // DAnimNotifyState에서 관리한다.
 
 // UI
 private:
-	UPROPERTY()
-	class UDUIInventory* m_pUIInventory;
 
 protected:
 	virtual void BeginPlay() override;

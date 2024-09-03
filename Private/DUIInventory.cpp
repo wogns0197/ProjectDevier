@@ -1,5 +1,6 @@
 #include "DUIInventory.h"
 #include "../DGameInstance.h"
+#include "DInventoryManagerSubSystem.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "UInventoryItemData.h"
 #include "DUIMovableTitle.h"
@@ -58,8 +59,8 @@ void UDUIInventory::OnVisibilityChanged_Callback( ESlateVisibility vis )
 	if ( vis != ESlateVisibility::Collapsed )
 		SetFocus();
 
-	if ( auto GI = Cast<UDGameInstance>( UGameplayStatics::GetGameInstance( GetWorld() ) ) ) {
-		GI->LastInventoryUIBagType = CurInvenType;
+	if ( UDInventoryManagerSubSystem* InvenMgr = UDInventoryManagerSubSystem::GetInstance() ) {
+		InvenMgr->LastInventoryUIBagType = CurInvenType;
 	}
 }
 
@@ -109,10 +110,9 @@ void UDUIInventory::UpdateTypeBag()
 	TileView_Inven->ClearListItems();
 
 	TArray<UUInventoryItemData*> ItemDataArr;
-	UDGameInstance* GI = Cast<UDGameInstance>( UGameplayStatics::GetGameInstance( GetWorld() ) );
-	if ( GI )
+	if ( UDInventoryManagerSubSystem* InvenMgr = UDInventoryManagerSubSystem::GetInstance() )
 	{
-		const TArray<FInventoryItem>& InvenBag = GI->GetInventoryBag( CurInvenType );
+		const TArray<FInventoryItem>& InvenBag = InvenMgr->GetInventoryBag( CurInvenType );
 		for ( const auto& el : InvenBag )
 		{
 			// 메모리관리 되는거 맞는지 확인 필요
