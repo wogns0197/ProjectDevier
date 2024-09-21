@@ -16,6 +16,7 @@ enum class EUIType : uint8
 	NONE,
 	UI_Interactive,
 	UI_Inventory,
+	UI_ToolTip,
 	UI_Hud,
 	UI_Map,
 	UI_VandingMachine,
@@ -46,6 +47,7 @@ public:
 	}
 
 	UUserWidget* OpenUI( EUIType InType );
+	UUserWidget* OpenUI( EUIType InType, const FVector2D& Pos );
 	bool IsUIOpened( EUIType InType );
 	void CloseUI( EUIType InType );
 };

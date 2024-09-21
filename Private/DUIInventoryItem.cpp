@@ -1,11 +1,13 @@
 #include "DUIInventoryItem.h"
 #include "Engine/Texture2D.h"
 #include "Kismet/GameplayStatics.h"
+#include "Blueprint/WidgetLayoutLibrary.h"
 #include "Components/Overlay.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "UInventoryItemData.h"
 #include "DInventoryManagerSubSystem.h"
+#include "../DHUDBase.h"
 
 void UDUIInventoryItem::NativeConstruct()
 {
@@ -58,6 +60,12 @@ void UDUIInventoryItem::NativeOnMouseEnter( const FGeometry& InGeometry, const F
 		if ( Image_Item && OnMouseEnterAnim )
 			PlayAnimation( OnMouseEnterAnim );
 		UGameplayStatics::GetPlayerController( GetWorld(), 0 )->CurrentMouseCursor = EMouseCursor::GrabHand;
+
+		if ( auto pHud = Cast<ADHUDBase>( UGameplayStatics::GetPlayerController( this, 0 )->GetHUD() ) )
+		{
+			FGeometry geom = GetCachedGeometry();
+			auto pUIToolTip = pHud->OpenUI( EUIType::UI_ToolTip, FVector2D(0));
+		}
 	}
 }
 
@@ -68,7 +76,20 @@ void UDUIInventoryItem::NativeOnMouseLeave( const FPointerEvent& InMouseEvent )
 		if ( Image_Item && OnMouseLeaveAnim )
 			PlayAnimation( OnMouseLeaveAnim );
 		UGameplayStatics::GetPlayerController( GetWorld(), 0 )->CurrentMouseCursor = EMouseCursor::Default;
+
+		if ( auto pHud = Cast<ADHUDBase>( UGameplayStatics::GetPlayerController( this, 0 )->GetHUD() ) ) {
+			pHud->CloseUI( EUIType::UI_ToolTip );
+		}
 	}
+}
+
+FReply UDUIInventoryItem::NativeOnMouseButtonDoubleClick( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent )
+{
+	if ( !bSetData ) return FReply::Unhandled();
+	FReply ret = Super::NativeOnMouseButtonDoubleClick( InGeometry, InMouseEvent );
+
+	return ret;
+
 }
 
 void UDUIInventoryItem::SetBackgroundEmpty( bool bEmpty )

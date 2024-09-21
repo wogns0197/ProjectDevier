@@ -26,6 +26,17 @@ UUserWidget* ADHUDBase::OpenUI( EUIType InType )
 	return nullptr;
 }
 
+UUserWidget* ADHUDBase::OpenUI( EUIType InType, const FVector2D& Pos )
+{
+	UUserWidget* wnd = OpenUI( InType );
+	if ( wnd ) {
+		// 음.. Visible 먼저하고 포지션 바꾸면 순간이동하는 것처럼 보이지 않을까나...
+		wnd->SetPositionInViewport( Pos );
+	}
+
+	return wnd;
+}
+
 void ADHUDBase::CloseUI( EUIType InType )
 {
 	if ( UUserWidget* wnd = UITrunk[InType] ) {

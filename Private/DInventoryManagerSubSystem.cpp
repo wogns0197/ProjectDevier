@@ -20,6 +20,9 @@ void UDInventoryManagerSubSystem::Init( const int nCountByType, const TMap<EInve
 			m_Inventory[i].Emplace(FInventoryItem(0, 0));
 		}
 	}
+
+	//test 장비 착용 테스트
+	m_Inventory[0][0] = FInventoryItem(1001, 1);
 }
 
 UDInventoryManagerSubSystem* UDInventoryManagerSubSystem::GetInstance()

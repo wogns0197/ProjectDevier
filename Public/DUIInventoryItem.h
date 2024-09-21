@@ -35,7 +35,8 @@ public:
 	virtual void NativeOnItemSelectionChanged( bool bIsSelected ) override;
 	virtual void NativeOnMouseEnter( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent );
 	virtual void NativeOnMouseLeave( const FPointerEvent& InMouseEvent );
-	
+	virtual FReply NativeOnMouseButtonDoubleClick( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent ) override;
+
 private:
 	void SetBackgroundEmpty( bool bEmpty );
 };
